@@ -1,4 +1,4 @@
-namespace Policy.Abstractions
+namespace PolicyExample.Abstractions
 {
     public interface IAggregateAddress
     {

@@ -1,8 +1,8 @@
-namespace Policy.Abstractions
+namespace PolicyExample.Abstractions
 {
     public static class Address
     {
-        public static AggregateAddress<T> New<T>(string id)
+        public static AggregateAddress<T> New<T>(string? id=null)
         {
             return new AggregateAddress<T>(id);
         }

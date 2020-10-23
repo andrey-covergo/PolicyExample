@@ -1,6 +1,6 @@
 using System;
 
-namespace Policy.Abstractions
+namespace PolicyExample.Abstractions
 {
     public class AggregateEvent:IAggregateEvent
     {
@@ -22,6 +22,11 @@ namespace Policy.Abstractions
         public AggregateEvent(AggregateAddress<T> source, string id, DateTimeOffset occured) : base(source, id, occured)
         {
             Source = source;
+        }
+
+        public AggregateEvent(string source, string? id=null) : this(Address.New<T>(source), id??Guid.NewGuid().ToString(), DateTimeOffset.Now)
+        {
+            
         }
         public new AggregateAddress<T> Source { get; }
     }

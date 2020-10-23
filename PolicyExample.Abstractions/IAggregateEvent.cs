@@ -1,6 +1,6 @@
 using System;
 
-namespace Policy.Abstractions
+namespace PolicyExample.Abstractions
 {
     public interface IAggregateEvent
     {

@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Policy.Abstractions
+namespace PolicyExample.Abstractions
 {
     public interface ICommandExecutor
     {
         Task<IReadOnlyCollection<IAggregateEvent>> Execute(ICommand command);
     }
+
+  
 }

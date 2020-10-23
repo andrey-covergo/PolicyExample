@@ -4,4 +4,8 @@
         <TargetFramework>netstandard2.1</TargetFramework>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\PolicyExample.Abstractions\PolicyExample.Abstractions.csproj" />
+    </ItemGroup>
+
 </Project>

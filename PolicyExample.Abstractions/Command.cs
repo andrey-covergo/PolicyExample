@@ -1,4 +1,6 @@
-namespace Policy.Abstractions
+using System;
+
+namespace PolicyExample.Abstractions
 {
     public abstract class Command : ICommand
     {
@@ -14,9 +16,13 @@ namespace Policy.Abstractions
     
     public class Command<T> : Command
     {
-        public Command(AggregateAddress<T> destination, string id) : base(destination, id)
+        public Command(AggregateAddress<T> destination, string? id=null) : base(destination, id??Guid.NewGuid().ToString())
         {
             Destination = destination;
+        }
+        
+        public Command(string destinationId, string? id=null) : this(new AggregateAddress<T>(id), id??Guid.NewGuid().ToString())
+        {
         }
         
         public new AggregateAddress<T> Destination { get; }

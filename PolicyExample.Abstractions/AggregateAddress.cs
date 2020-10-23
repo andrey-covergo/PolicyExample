@@ -1,4 +1,6 @@
-namespace Policy.Abstractions
+using System;
+
+namespace PolicyExample.Abstractions
 {
     public class AggregateAddress : IAggregateAddress
     {
@@ -14,7 +16,7 @@ namespace Policy.Abstractions
     
     public class AggregateAddress<T> : AggregateAddress
     {
-        public AggregateAddress(string id) : base(typeof(T).Name, id)
+        public AggregateAddress(string? id=null) : base(typeof(T).Name, id??Guid.NewGuid().ToString())
         {
         }
     }
