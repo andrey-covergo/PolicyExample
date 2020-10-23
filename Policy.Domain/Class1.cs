@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Policy.Abstractions
+namespace Policy.Domain
 {
     public class Class1
     {
