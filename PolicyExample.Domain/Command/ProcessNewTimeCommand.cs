@@ -7,7 +7,7 @@ namespace PolicyExample.Domain
     {
         public DateTimeOffset NewNowTime { get; }
 
-        public ProcessNewTimeCommand(string policyId, in DateTimeOffset newNowTime):base(policyId)
+        public ProcessNewTimeCommand(string policyId, DateTimeOffset newNowTime):base(policyId)
         {
             NewNowTime = newNowTime;
         }

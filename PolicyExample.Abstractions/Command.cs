@@ -21,7 +21,7 @@ namespace PolicyExample.Abstractions
             Destination = destination;
         }
         
-        public Command(string destinationId, string? id=null) : this(new AggregateAddress<T>(id), id??Guid.NewGuid().ToString())
+        public Command(string destinationId, string? id=null) : this(new AggregateAddress<T>(destinationId), id)
         {
         }
         

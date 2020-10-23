@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using FluentAssertions;
 using PolicyExample.Abstractions;
 using PolicyExample.Domain;
@@ -57,7 +58,7 @@ namespace PolicyExample.Tests
             IAggregate policyAggregate = policy;
             policyAggregate.Apply(new PolicyCreatedEvent());
             
-            policy.Invoking(p=>p.Execute(new IssuePolicyCommand(policy.Address)))
+            policy.Invoking(async p=>await p.Execute(new IssuePolicyCommand(policy.Address)))
                   .Should().Throw<PolicyMissingDurationException>();
         }
         
@@ -69,13 +70,13 @@ namespace PolicyExample.Tests
             policyAggregate.Apply(new PolicyCreatedEvent());
             policyAggregate.Apply(new PolicyDurationSetEvent(policy.Address.Id,TimeSpan.FromDays(1)));
             
-            policy.Invoking(p=>p.Execute(new IssuePolicyCommand(policy.Address)))
+            policy.Invoking(async p=>await p.Execute(new IssuePolicyCommand(policy.Address)))
                 .Should().Throw<PolicyZeroAmountException>();
         }
         
          
         [Fact]
-        public void Given_policy_with_duration_and_amount_When_issuing_Then_get_issued_event()
+        public async Task Given_policy_with_duration_and_amount_When_issuing_Then_get_issued_event()
         {
             var policy = new Policy();
             IAggregate policyAggregate = policy;
@@ -84,12 +85,12 @@ namespace PolicyExample.Tests
             policyAggregate.Apply(new PolicyAmountSetEvent(policy.Address.Id,10m));
 
             var issueDate = DateTimeOffset.Now;
-            var events = policy.Execute(new IssuePolicyCommand(policy.Address,issueDate));
+            var events = await policy.Execute(new IssuePolicyCommand(policy.Address,issueDate));
             events.Should().BeEquivalentTo(new PolicyIssuedEvent(policy.Address.Id,issueDate));
         }
         
         [Fact]
-        public void Given_not_issued_policy_with_duration_and_amount_When_claiming_within_budget_Then_get_error()
+        public async Task Given_not_issued_policy_with_duration_and_amount_When_claiming_within_budget_Then_get_error()
         {
             var policy = new Policy();
             IAggregate policyAggregate = policy;
@@ -98,7 +99,7 @@ namespace PolicyExample.Tests
                                   new PolicyAmountSetEvent(policy.Address.Id,10m));
 
             var issueDate = DateTimeOffset.Now;
-            var events = policy.Execute(new IssuePolicyCommand(policy.Address,issueDate));
+            var events = await policy.Execute(new IssuePolicyCommand(policy.Address,issueDate));
             events.Should().BeEquivalentTo(new PolicyIssuedEvent(policy.Address.Id,issueDate));
         }
 
@@ -112,7 +113,7 @@ namespace PolicyExample.Tests
                          new PolicyDurationSetEvent(id,TimeSpan.FromDays(1)),
                          new PolicyAmountSetEvent(id,10m));
             
-            policy.Invoking(p=>p.Execute(new ProcessClaimCommand(policy.Address, new Claim(1m))))
+            policy.Invoking(async p=> await p.Execute(new ProcessClaimCommand(policy.Address, new Claim(1m))))
                   .Should().Throw<PolicyNotIssuedException>();
         }
         
@@ -127,12 +128,12 @@ namespace PolicyExample.Tests
                          new PolicyAmountSetEvent(id,10m),
                          new PolicyIssuedEvent(id, DateTimeOffset.Now));
             
-            policy.Invoking(p=>p.Execute(new ProcessClaimCommand(policy.Address, new Claim(100m))))
+            policy.Invoking(async p=> await p.Execute(new ProcessClaimCommand(policy.Address, new Claim(100m))))
                  .Should().Throw<PolicyAmountExceedException>();
         }
         
         [Fact]
-        public void Given_issued_policy_When_claiming_in_budget_Then_get_payment()
+        public async Task Given_issued_policy_When_claiming_in_budget_Then_get_payment()
         {
             var policy = new Policy();
             var id = Guid.NewGuid().ToString();
@@ -142,12 +143,12 @@ namespace PolicyExample.Tests
                 new PolicyAmountSetEvent(id,10m),
                 new PolicyIssuedEvent(id, DateTimeOffset.Now));
             
-            var events = policy.Execute(new ProcessClaimCommand(policy.Address, new Claim(5m)));
+            var events = await policy.Execute(new ProcessClaimCommand(policy.Address, new Claim(5m)));
             events.Should().BeEquivalentTo(new ClaimFulfilledEvent(id, 5));
         }
         
         [Fact]
-        public void Given_issued_policy_When_time_pass_less_then_duration_Then_policy_does_not_expire()
+        public async Task Given_issued_policy_When_time_pass_less_then_duration_Then_policy_does_not_expire()
         {
             var policy = new Policy();
             var id = Guid.NewGuid().ToString();
@@ -159,12 +160,12 @@ namespace PolicyExample.Tests
             );
 
             var newTime = DateTimeOffset.Now.AddDays(1000);
-            var events = policy.Execute(new ProcessNewTimeCommand(id, newTime));
-            events.Should().BeEquivalentTo(new IAggregateEvent[] {new PolicyTimePassedEvent(id, newTime)});
+            var events = await policy.Execute(new ProcessNewTimeCommand(id, newTime));
+            events.Should().BeEquivalentTo(new PolicyTimePassedEvent(id, newTime));
         }
         
         [Fact]
-        public void Given_issued_policy_When_time_pass_more_then_duration_Then_policy_expires()
+        public async Task Given_issued_policy_When_time_pass_more_then_duration_Then_policy_expires()
         {
             var policy = new Policy();
             var id = Guid.NewGuid().ToString();
@@ -177,7 +178,7 @@ namespace PolicyExample.Tests
 
 
             var newTime = DateTimeOffset.Now.AddDays(1000);
-            var events = policy.Execute(new ProcessNewTimeCommand(id, newTime));
+            var events = await policy.Execute(new ProcessNewTimeCommand(id, newTime));
             events.Should().BeEquivalentTo( new IAggregateEvent[]{new PolicyTimePassedEvent(id, newTime),
                                                                             new PolicyExpiredEvent(id)});
         }
@@ -196,7 +197,7 @@ namespace PolicyExample.Tests
                          new PolicyExpiredEvent(id)
                     );
 
-            policy.Invoking(p=>p.Execute(new ProcessClaimCommand(policy.Address, new Claim(1m))))
+            policy.Invoking(async p=>await p.Execute(new ProcessClaimCommand(policy.Address, new Claim(1m))))
                 .Should().Throw<PolicyExpiredException>();
         }
         
@@ -208,8 +209,8 @@ namespace PolicyExample.Tests
             
             policy.Apply(new PolicyCreatedEvent(id));
 
-            policy.Invoking(p=>p.Execute(new SomeCommand()))
-                  .Should().Throw<PolicyExpiredException>();
+            policy.Invoking(async p=>await p.Execute(new SomeCommand(){Destination = Address.New<Policy>(id)}))
+                  .Should().Throw<AggregateIdMismatchException>();
         }
         
         [Fact]
@@ -220,13 +221,13 @@ namespace PolicyExample.Tests
             
             policy.Apply(new PolicyCreatedEvent(id));
 
-            policy.Invoking(p=>p.Execute( new ProcessNewTimeCommand(Guid.NewGuid().ToString(), DateTimeOffset.Now)))
+            policy.Invoking(async p=> await p.Execute( new ProcessNewTimeCommand(Guid.NewGuid().ToString(), DateTimeOffset.Now)))
                 .Should().Throw<AggregateIdMismatchException>();
         }
 
         class SomeCommand : ICommand
         {
-            public IAggregateAddress Destination { get; }
+            public IAggregateAddress Destination { get; set; }
             public string Id { get; }
         }
     }
