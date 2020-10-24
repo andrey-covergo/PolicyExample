@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Threading.Tasks;
 using PolicyExample.Abstractions;
 
@@ -26,30 +24,30 @@ namespace PolicyExample.Domain
             switch (command)
             {
                 case IssuePolicyCommand c: 
-                    if (_duration ==null) throw new PolicyMissingDurationException();
-                    if(_amount <= 0) throw new PolicyZeroAmountException();
-                    yield return Emit(new PolicyIssuedEvent(Address.Id, c.IssueDate));
+                    if (_state.Duration ==null) throw new PolicyMissingDurationException();
+                    if(_state.Amount <= 0) throw new PolicyZeroAmountException();
+                    yield return Apply(new PolicyIssuedEvent(Address.Id, c.IssueDate));
                 break;
                     
                 case ProcessClaimCommand c:
-                    if(_isExpired) throw new PolicyExpiredException();
-                    if(!_issued) throw new PolicyNotIssuedException();
-                    if(_amount < c.Claim.Amount) throw new PolicyAmountExceedException();
-                    yield return Emit(new ClaimFulfilledEvent(Address, c.Claim.Amount)); 
+                    if(_state.IsExpired) throw new PolicyExpiredException();
+                    if(!_state.Issued) throw new PolicyNotIssuedException();
+                    if(_state.Amount < c.Claim.Amount) throw new PolicyAmountExceedException();
+                    yield return Apply(new ClaimFulfilledEvent(Address, c.Claim.Amount)); 
                 break;
 
                 case ProcessNewTimeCommand c:
-                    yield return Emit(new PolicyTimePassedEvent(Address.Id,c.NewNowTime));
-                    if (_businessTime >= _expiryDate)
-                        yield return Emit(new PolicyExpiredEvent(Address.Id));
+                    yield return Apply(new PolicyTimePassedEvent(Address.Id,c.NewNowTime));
+                    if (_state.BusinessTime >= _state.ExpiryDate)
+                        yield return Apply(new PolicyExpiredEvent(Address.Id));
                     break;
                 
                 case SetPolicyAmountCommand c:
-                    yield return Emit(new PolicyAmountSetEvent(Address.Id,c.Amount));
+                    yield return Apply(new PolicyAmountSetEvent(Address.Id,c.Amount));
                     break;
                 
                 case SetPolicyDurationCommand c:
-                    yield return Emit(new PolicyDurationSetEvent(Address.Id,c.Duration));
+                    yield return Apply(new PolicyDurationSetEvent(Address.Id,c.Duration));
                     break;
                 default:
                     throw new UnsupportedCommandException();
@@ -67,68 +65,69 @@ namespace PolicyExample.Domain
         
         public long Version { get; private set; }
 
-        private bool _issued;
-        private TimeSpan? _duration;
-        private DateTimeOffset? _issuedDate;
-        private DateTimeOffset? _expiryDate;
-        private bool _isExpired;
-        private decimal _amount;
-        private DateTimeOffset _businessTime;
-
-        private IAggregateEvent Emit(IAggregateEvent @event)
-        {
-            Version++;
-            ((IAggregate) this).Apply(@event);
-            return @event;
-        }
+        private PolicyState _state = new PolicyState();
+   
+         private IAggregateEvent Apply<T>(T @event)where T:IAggregateEvent
+         {
+             ((IAggregate) this).Apply(@event);
+              return @event;
+         }
         void IAggregate.Apply(IAggregateEvent @event)
         {
             switch (@event)
             {
                 case PolicyCreatedEvent e: Address = e.Source;
                     break;
-                case PolicyExpiredEvent e: _isExpired = true;
-                    _expiryDate = e.Occured;
+                case PolicyExpiredEvent e: _state.IsExpired = true;
+                    _state.ExpiryDate = e.Occured;
                     break;
-                case PolicyIssuedEvent e: _issued = true;
-                    _issuedDate = e.Issued;
-                    _expiryDate = _issuedDate + _duration;
+                case PolicyIssuedEvent e: _state.Issued = true;
+                    _state.IssueDate = e.Issued;
+                    _state.ExpiryDate = _state.IssueDate + _state.Duration;
                     break;
-                case PolicyAmountSetEvent e: _amount = e.Amount;
+                case PolicyAmountSetEvent e: _state.Amount = e.Amount;
                     break;
-                case PolicyDurationSetEvent e: _duration = e.Duration;
+                case PolicyDurationSetEvent e: _state.Duration = e.Duration;
                     break;
-                case PolicyTimePassedEvent e: _businessTime = e.CurrentTime;
+                case PolicyTimePassedEvent e: _state.BusinessTime = e.CurrentTime;
+                    break;
+                default:
+                    Version--;
                     break;
             }
+            Version++;
         }
 
         public AggregateAddress<InsurancePolicy> Address { get; private set; }
         IAggregateAddress IAggregate.Address => Address;
-
+        
         public IAggregate RestoreFromSnapshot(ISnapshot snapshot)
         {
-            if (snapshot is PolicySnapshot policySnapshot)
+            if (snapshot is SnapshotState<PolicyState> policySnapshot)
             {
-                Address = policySnapshot.Address;
+                _state = policySnapshot.State;
                 Version = policySnapshot.Version;
-                _duration = policySnapshot.Duration;
-                _issuedDate = policySnapshot.IssueDate;
+                Address = new AggregateAddress<InsurancePolicy>(policySnapshot.Address.Id);
             }
-
+            else
+                throw new UnsupportedSnapshotException();
+            
             return this;
         }
 
         public ISnapshot BuildSnapshot()
         {
-            return new PolicySnapshot
+            return new SnapshotState<PolicyState>
             {
                 Address = this.Address,
                 Version = this.Version,
                 Id = Guid.NewGuid().ToString(),
-                Duration = this._duration,
-                IssueDate = this._issuedDate
+                State = (PolicyState)this._state.Clone(),
             };
         }
+    }
+
+    public class UnsupportedSnapshotException : Exception
+    {
     }
 }

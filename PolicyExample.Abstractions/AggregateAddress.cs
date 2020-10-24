@@ -47,8 +47,6 @@ namespace PolicyExample.Abstractions
 
         public string Type { get; }
         public string Id { get; }
-        
-        
     }
     
     public class AggregateAddress<T> : AggregateAddress
@@ -66,7 +64,6 @@ namespace PolicyExample.Abstractions
         {
             return !Equals(left, right);
         }
-       
     }
 
 }

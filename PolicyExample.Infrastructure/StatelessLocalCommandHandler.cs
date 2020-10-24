@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using PolicyExample.Abstractions;
@@ -24,8 +25,11 @@ namespace PolicyExample.Infrastructure
             await _eventStore.SaveEvents(command.Id, events);
             
             //after event persistence we must be tolerant to any snapshot persistence failure
-            if (aggregate is ISupportSnapshots withsnapshots)
-                await _snapshotStore.SaveSnapshot(withsnapshots.BuildSnapshot());
+            if (aggregate is ISupportSnapshots currentAggregate)
+            {
+                var snapshot = currentAggregate.BuildSnapshot();
+                await _snapshotStore.SaveSnapshot(snapshot);
+            }
             
             return events;
         }
@@ -48,5 +52,9 @@ namespace PolicyExample.Infrastructure
 
             return aggregate;
         }
+    }
+
+    public class SnapshotChecksumMismatchException : Exception
+    {
     }
 }

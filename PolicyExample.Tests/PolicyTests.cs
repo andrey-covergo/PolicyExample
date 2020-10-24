@@ -21,6 +21,12 @@ namespace PolicyExample.Tests
             return aggregate;
         }
         
+        public static T ApplyEvent<T>(this IAggregate aggregate, T evt) where T:IAggregateEvent
+        {
+            aggregate.Apply(evt);
+            return evt;
+        }
+        
         
     }
 
@@ -46,13 +52,47 @@ namespace PolicyExample.Tests
         [Fact]
         public void Given_policy_snapshot_When_restoring_Then_it_succeed()
         {
-            var faker = new PolicySnapshotFaker();
-            var snapshot = faker.Generate();
+            var snapshot = new PolicyState()
+            {
+                Amount = 5,
+                BusinessTime = DateTimeOffset.Now,
+                Duration = TimeSpan.FromDays(1),
+                ExpiryDate = DateTimeOffset.Now.AddDays(10),
+                IsExpired = false,
+                Issued = true,
+                IssueDate = DateTimeOffset.Now
+            };
             var policy = new InsurancePolicy();
-            policy.RestoreFromSnapshot(snapshot);
-            //should we check for internal state? 
-            //or check by command execution ? 
+            policy.RestoreFromSnapshot(new SnapshotState<PolicyState>{State = snapshot, Address = new AggregateAddress<InsurancePolicy>(),Id = Guid.NewGuid().ToString(), Version = 100});
         }
+        
+        [Fact]
+        public void Given_setup_policy_When_restoring_from_snapshot_Then_policy_is_the_same_as_before()
+        {
+            var policy = new InsurancePolicy();
+            var address = Address.New<InsurancePolicy>();
+            IAggregate policyAggregate = policy;
+           
+            policyAggregate.Apply(new PolicyCreatedEvent(address.Id));
+            var durationSetEvent = policyAggregate.ApplyEvent(new PolicyDurationSetEvent(address.Id,TimeSpan.FromDays(30)));
+            var policyAmountEvent = policyAggregate.ApplyEvent(new PolicyAmountSetEvent(address.Id, 20m));
+            var issuedEvent = policyAggregate.ApplyEvent(new PolicyIssuedEvent(address.Id, DateTimeOffset.Now));
+            policyAggregate.Apply(new PolicyTimePassedEvent(address.Id, DateTimeOffset.Now.AddMinutes(1)));
+            policyAggregate.Apply(new ClaimFulfilledEvent(address.Id, 2m));
+            policyAggregate.Apply(new PolicyExpiredEvent(address.Id));
+
+            var snapshot = (SnapshotState<PolicyState>)(policy as ISupportSnapshots).BuildSnapshot();
+
+            snapshot.Address.Should().BeEquivalentTo(address);
+            snapshot.Id.Should().NotBeNullOrEmpty();
+            snapshot.Version.Should().Be(policy.Version);
+            snapshot.State.Duration.Should().Be(durationSetEvent.Duration);
+            snapshot.State.IssueDate.Should().Be(issuedEvent.Issued);
+
+            var restoredSnapshot = ((InsurancePolicy)new InsurancePolicy().RestoreFromSnapshot(snapshot)).BuildSnapshot();
+            snapshot.Should().BeEquivalentTo(restoredSnapshot, o=>o.Excluding(s => s.Id));
+        }
+
         
         [Fact]
         public void Given_policy_When_building_a_snapshot_Then_it_has_fields_from_the_aggregate()
@@ -66,13 +106,13 @@ namespace PolicyExample.Tests
            var issuedDate = DateTimeOffset.Now;
            policyAggregate.Apply(new PolicyIssuedEvent(address.Id, issuedDate));
 
-           var snapshot = (PolicySnapshot)(policy as ISupportSnapshots).BuildSnapshot();
+           var snapshot = (SnapshotState<PolicyState>)(policy as ISupportSnapshots).BuildSnapshot();
             
            snapshot.Address.Should().BeEquivalentTo(address);
            snapshot.Id.Should().NotBeNullOrEmpty();
            snapshot.Version.Should().Be(policy.Version);
-           snapshot.Duration.Should().Be(TimeSpan.FromDays(30));
-           snapshot.IssueDate.Should().Be(issuedDate);
+           snapshot.State.Duration.Should().Be(TimeSpan.FromDays(30));
+           snapshot.State.IssueDate.Should().Be(issuedDate);
         }
         
         [Fact]
@@ -84,6 +124,15 @@ namespace PolicyExample.Tests
             
             policy.Invoking(async p=>await p.Execute(new IssuePolicyCommand(policy.Address)))
                   .Should().Throw<PolicyMissingDurationException>();
+        } 
+        
+        [Fact]
+        public void Given_policy_When_apply_event_Then_version_is_changed()
+        {
+            var policy = new InsurancePolicy();
+            IAggregate policyAggregate = policy;
+            policy.Version.Should().Be(0);
+            policyAggregate.Apply(new PolicyCreatedEvent());
         }
         
         [Fact]
@@ -178,12 +227,12 @@ namespace PolicyExample.Tests
             var id = Guid.NewGuid().ToString();
             
             policy.Apply(new PolicyCreatedEvent(id),
-                new PolicyDurationSetEvent(id,TimeSpan.FromDays(1)),
+                new PolicyDurationSetEvent(id,TimeSpan.FromDays(10)),
                 new PolicyAmountSetEvent(id,10m),
                 new PolicyIssuedEvent(id, DateTimeOffset.Now)
             );
 
-            var newTime = DateTimeOffset.Now.AddDays(1000);
+            var newTime = DateTimeOffset.Now.AddDays(1);
             var events = await policy.Execute(new ProcessNewTimeCommand(id, newTime));
             events.Should().BeLike(new PolicyTimePassedEvent(id, newTime));
         }
