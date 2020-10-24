@@ -2,9 +2,14 @@ using System;
 
 namespace PolicyExample.Abstractions
 {
-    public class AggregateAddress : IAggregateAddress, IEquatable<AggregateAddress>
+
+    public static class AggregateAddressExtensions
     {
-        public bool Equals(AggregateAddress? other)
+        
+    }
+    public class AggregateAddress : IAggregateAddress
+    {
+        public bool Equals(IAggregateAddress? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -15,7 +20,7 @@ namespace PolicyExample.Abstractions
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+          //  if (obj.GetType() != this.GetType()) return false;
             return Equals((AggregateAddress) obj);
         }
 
@@ -24,12 +29,12 @@ namespace PolicyExample.Abstractions
             return HashCode.Combine(Type, Id);
         }
 
-        public static bool operator ==(AggregateAddress? left, AggregateAddress? right)
+        public static bool operator ==(AggregateAddress? left, IAggregateAddress? right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(AggregateAddress? left, AggregateAddress? right)
+        public static bool operator !=(AggregateAddress? left, IAggregateAddress? right)
         {
             return !Equals(left, right);
         }
@@ -50,6 +55,16 @@ namespace PolicyExample.Abstractions
     {
         public AggregateAddress(string? id=null) : base(id??Guid.NewGuid().ToString(), typeof(T).Name)
         {
+        }
+        
+        public static bool operator ==(AggregateAddress<T>? left, IAggregateAddress? right)
+        {
+            return Equals(left, right);
+        }
+        
+        public static bool operator !=(AggregateAddress<T>? left, IAggregateAddress? right)
+        {
+            return !Equals(left, right);
         }
        
     }

@@ -3,11 +3,11 @@ using PolicyExample.Abstractions;
 
 namespace PolicyExample.Domain
 {
-    public class SetPolicyAmountCommand : Command<Policy>
+    public class SetPolicyAmountCommand : Command<InsurancePolicy>
     {
         public decimal Amount { get; }
 
-        public SetPolicyAmountCommand(AggregateAddress<Policy> destination, decimal amount) : base(destination)
+        public SetPolicyAmountCommand(AggregateAddress<InsurancePolicy> destination, decimal amount) : base(destination)
         {
             Amount = amount;
         }

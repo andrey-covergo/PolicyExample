@@ -3,7 +3,7 @@ using PolicyExample.Abstractions;
 
 namespace PolicyExample.Domain
 {
-    public class ProcessNewTimeCommand : Command<Policy>
+    public class ProcessNewTimeCommand : Command<InsurancePolicy>
     {
         public DateTimeOffset NewNowTime { get; }
 
