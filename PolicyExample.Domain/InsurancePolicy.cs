@@ -112,12 +112,12 @@ namespace PolicyExample.Domain
                         yield return Apply(new PolicyExpiredEvent(Address.Id));
                     break;
 
-                case SetPolicyAmountCommand c:
-                    yield return Apply(new PolicyAmountSetEvent(Address.Id, c.Amount));
-                    break;
+                case ConfigurePolicyCommand c:
+                    if(c.Duration.HasValue)
+                        yield return Apply(new PolicyDurationSetEvent(Address.Id, c.Duration.Value));
+                    if(c.Amount.HasValue)
+                        yield return Apply(new PolicyAmountSetEvent(Address.Id, c.Amount.Value));
 
-                case SetPolicyDurationCommand c:
-                    yield return Apply(new PolicyDurationSetEvent(Address.Id, c.Duration));
                     break;
                 default:
                     throw new UnsupportedCommandException();

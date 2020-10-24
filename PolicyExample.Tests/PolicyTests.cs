@@ -132,7 +132,7 @@ namespace PolicyExample.Tests
         }
 
         [Fact]
-        public async Task Given_not_issued_policy_with_duration_and_amount_When_claiming_within_budget_Then_get_error()
+        public void Given_not_issued_policy_with_duration_and_amount_When_claiming_within_budget_Then_get_error()
         {
             var policy = new InsurancePolicy();
             //IAggregate policyAggregate = policy;
