@@ -1,12 +1,8 @@
 using System;
 
-namespace PolicyExample.Domain
+namespace PolicyExample.Domain.Exceptions
 {
-    public class PolicyNotIssuedException:Exception
-    {
-    }
-    
-    public class AggregateIdMismatchException:Exception
+    public class PolicyNotIssuedException : Exception
     {
     }
 }

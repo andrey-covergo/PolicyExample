@@ -1,8 +1,8 @@
 using System;
 
-namespace PolicyExample.Domain
+namespace PolicyExample.Domain.Exceptions
 {
-    public class PolicyZeroAmountException:Exception
+    public class PolicyZeroAmountException : Exception
     {
     }
 }

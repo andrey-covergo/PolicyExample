@@ -1,14 +1,14 @@
 using System;
 
-namespace PolicyExample.Domain
+namespace PolicyExample.Domain.Events
 {
     public class PolicyTimePassedEvent : PolicyEvent
     {
-        public DateTimeOffset CurrentTime { get; }
-
         public PolicyTimePassedEvent(string source, DateTimeOffset currentTime) : base(source)
         {
             CurrentTime = currentTime;
         }
+
+        public DateTimeOffset CurrentTime { get; }
     }
 }

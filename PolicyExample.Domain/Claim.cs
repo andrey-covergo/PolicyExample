@@ -1,4 +1,3 @@
-
 namespace PolicyExample.Domain
 {
     public class Claim

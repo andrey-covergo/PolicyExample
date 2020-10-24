@@ -7,6 +7,4 @@ namespace PolicyExample.Abstractions
     {
         Task<IReadOnlyCollection<IAggregateEvent>> Execute(ICommand command);
     }
-
-  
 }

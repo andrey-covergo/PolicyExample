@@ -1,9 +1,9 @@
 namespace PolicyExample.Abstractions
 {
-    public interface IAggregate:ICommandExecutor
+    public interface IAggregateRoot : ICommandExecutor
     {
         long Version { get; }
-        void Apply(IAggregateEvent @event);
         IAggregateAddress Address { get; }
+        void Apply(IAggregateEvent @event);
     }
 }

@@ -1,5 +1,3 @@
-using System;
-
 namespace PolicyExample.Abstractions
 {
     public interface ISnapshot

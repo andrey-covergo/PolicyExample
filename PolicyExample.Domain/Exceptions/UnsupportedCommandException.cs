@@ -1,9 +1,8 @@
 using System;
 
-namespace PolicyExample.Domain
+namespace PolicyExample.Domain.Exceptions
 {
-    public class UnsupportedCommandException: Exception
+    public class UnsupportedCommandException : Exception
     {
-      
     }
 }

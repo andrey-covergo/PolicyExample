@@ -1,10 +1,10 @@
 using System;
 
-namespace PolicyExample.Domain
+namespace PolicyExample.Domain.Events
 {
-    public class PolicyCreatedEvent:PolicyEvent
+    public class PolicyCreatedEvent : PolicyEvent
     {
-        public PolicyCreatedEvent(string? source=null) : base(source??Guid.NewGuid().ToString())
+        public PolicyCreatedEvent(string? source = null) : base(source ?? Guid.NewGuid().ToString())
         {
         }
     }

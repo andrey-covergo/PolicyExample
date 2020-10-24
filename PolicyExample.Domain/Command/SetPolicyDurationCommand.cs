@@ -1,15 +1,16 @@
 using System;
 using PolicyExample.Abstractions;
 
-namespace PolicyExample.Domain
+namespace PolicyExample.Domain.Command
 {
     public class SetPolicyDurationCommand : Command<InsurancePolicy>
     {
-        public TimeSpan Duration { get; }
-
-        public SetPolicyDurationCommand(AggregateAddress<InsurancePolicy> destination, TimeSpan duration) : base(destination)
+        public SetPolicyDurationCommand(AggregateAddress<InsurancePolicy> destination, TimeSpan duration) : base(
+            destination)
         {
             Duration = duration;
         }
+
+        public TimeSpan Duration { get; }
     }
 }

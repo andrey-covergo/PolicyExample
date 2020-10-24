@@ -2,7 +2,7 @@ namespace PolicyExample.Abstractions
 {
     public interface ISupportSnapshots
     {
-        IAggregate RestoreFromSnapshot(ISnapshot snapshot);
+        IAggregateRoot RestoreFromSnapshot(ISnapshot snapshot);
         ISnapshot BuildSnapshot();
     }
 }

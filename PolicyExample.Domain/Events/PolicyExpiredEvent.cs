@@ -1,8 +1,8 @@
-namespace PolicyExample.Domain
+namespace PolicyExample.Domain.Events
 {
-    public class PolicyExpiredEvent:PolicyEvent
+    public class PolicyExpiredEvent : PolicyEvent
     {
-        public PolicyExpiredEvent(string id):base(id)
+        public PolicyExpiredEvent(string id) : base(id)
         {
         }
     }

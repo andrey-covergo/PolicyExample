@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using PolicyExample.Abstractions;
 
@@ -10,7 +9,7 @@ namespace PolicyExample.Infrastructure
         private readonly ICommandExecutor _executor;
         private readonly IEventPublisher _publisher;
 
-        public EventPublishingCommandHandler(ICommandExecutor executor,IEventPublisher publisher)
+        public EventPublishingCommandHandler(ICommandExecutor executor, IEventPublisher publisher)
         {
             _publisher = publisher;
             _executor = executor;
