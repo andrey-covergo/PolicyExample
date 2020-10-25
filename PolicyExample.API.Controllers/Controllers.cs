@@ -4,6 +4,8 @@
 // </auto-generated>
 //----------------------
 
+using System.Linq;
+
 #pragma warning disable 108 // Disable "CS0108 '{derivedDto}.ToJson()' hides inherited member '{dtoBase}.ToJson()'. Use the new keyword if hiding was intended."
 #pragma warning disable 114 // Disable "CS0114 '{derivedDto}.RaisePropertyChanged(String)' hides inherited member 'dtoBase.RaisePropertyChanged(String)'. To make the current member override that implementation, add the override keyword. Otherwise add the new keyword."
 #pragma warning disable 472 // Disable "CS0472 The result of the expression is always 'false' since a value of type 'Int32' is never equal to 'null' of type 'Int32?'
@@ -19,16 +21,16 @@ namespace PolicyExampleAPI
     {
         /// <summary>Get policies</summary>
         /// <returns>OK</returns>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<PolicyState>> PolicyGetAsync();
+        System.Threading.Tasks.Task<Response<System.Collections.Generic.ICollection<PolicyState>>> PolicyGetAsync();
     
         /// <summary>Create policy</summary>
         /// <returns>OK</returns>
-        System.Threading.Tasks.Task<string> PolicyPostAsync();
+        System.Threading.Tasks.Task<Response<string>> PolicyPostAsync();
     
         /// <summary>Get policy details</summary>
         /// <param name="policyId">id of the policy for the operation</param>
         /// <returns>OK</returns>
-        System.Threading.Tasks.Task<PolicyState> PolicyGetAsync(string policyId);
+        System.Threading.Tasks.Task<Response<PolicyState>> PolicyGetAsync(string policyId);
     
     }
     
@@ -45,26 +47,50 @@ namespace PolicyExampleAPI
         /// <summary>Get policies</summary>
         /// <returns>OK</returns>
         [Microsoft.AspNetCore.Mvc.HttpGet, Microsoft.AspNetCore.Mvc.Route("policy")]
-        public System.Threading.Tasks.Task<System.Collections.Generic.ICollection<PolicyState>> PolicyGet()
+        public async System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.IActionResult> PolicyGet()
         {
-            return _implementation.PolicyGetAsync();
+            var result = await _implementation.PolicyGetAsync().ConfigureAwait(false);
+    
+            var status = result.StatusCode;
+            Microsoft.AspNetCore.Mvc.ObjectResult response = new Microsoft.AspNetCore.Mvc.ObjectResult(result.Result) { StatusCode = status };
+    
+            foreach (var header in result.Headers)
+                Request.HttpContext.Response.Headers.Add(header.Key, new Microsoft.Extensions.Primitives.StringValues(header.Value.ToArray()));
+    
+            return response;
         }
     
         /// <summary>Create policy</summary>
         /// <returns>OK</returns>
         [Microsoft.AspNetCore.Mvc.HttpPost, Microsoft.AspNetCore.Mvc.Route("policy")]
-        public System.Threading.Tasks.Task<string> PolicyPost()
+        public async System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.IActionResult> PolicyPost()
         {
-            return _implementation.PolicyPostAsync();
+            var result = await _implementation.PolicyPostAsync().ConfigureAwait(false);
+    
+            var status = result.StatusCode;
+            Microsoft.AspNetCore.Mvc.ObjectResult response = new Microsoft.AspNetCore.Mvc.ObjectResult(result.Result) { StatusCode = status };
+    
+            foreach (var header in result.Headers)
+                Request.HttpContext.Response.Headers.Add(header.Key, new Microsoft.Extensions.Primitives.StringValues(header.Value.ToArray()));
+    
+            return response;
         }
     
         /// <summary>Get policy details</summary>
         /// <param name="policyId">id of the policy for the operation</param>
         /// <returns>OK</returns>
         [Microsoft.AspNetCore.Mvc.HttpGet, Microsoft.AspNetCore.Mvc.Route("policy/{policyId}")]
-        public System.Threading.Tasks.Task<PolicyState> PolicyGet(string policyId)
+        public async System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.IActionResult> PolicyGet(string policyId)
         {
-            return _implementation.PolicyGetAsync(policyId);
+            var result = await _implementation.PolicyGetAsync(policyId).ConfigureAwait(false);
+    
+            var status = result.StatusCode;
+            Microsoft.AspNetCore.Mvc.ObjectResult response = new Microsoft.AspNetCore.Mvc.ObjectResult(result.Result) { StatusCode = status };
+    
+            foreach (var header in result.Headers)
+                Request.HttpContext.Response.Headers.Add(header.Key, new Microsoft.Extensions.Primitives.StringValues(header.Value.ToArray()));
+    
+            return response;
         }
     
     }
@@ -74,15 +100,15 @@ namespace PolicyExampleAPI
     {
         /// <summary>Get issuance requests</summary>
         /// <returns>OK</returns>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Anonymous>> IssuanceGetAsync(string policyId);
+        System.Threading.Tasks.Task<Response<System.Collections.Generic.ICollection<IssuanceWithStatus>>> IssuanceGetAsync(string policyId);
     
         /// <summary>Create issuance request</summary>
         /// <returns>OK</returns>
-        System.Threading.Tasks.Task<RequestStatus> IssuancePostAsync(IssuanceRequest body, string policyId);
+        System.Threading.Tasks.Task<Response<RequestStatus>> IssuancePostAsync(IssuanceRequest body, string policyId);
     
         /// <summary>Get issuance request details</summary>
         /// <returns>OK</returns>
-        System.Threading.Tasks.Task<RequestStatus> IssuanceGetAsync(string policyId, string issuanceId);
+        System.Threading.Tasks.Task<Response<IssuanceWithStatus>> IssuanceGetAsync(string policyId, string issuanceId);
     
     }
     
@@ -99,25 +125,49 @@ namespace PolicyExampleAPI
         /// <summary>Get issuance requests</summary>
         /// <returns>OK</returns>
         [Microsoft.AspNetCore.Mvc.HttpGet, Microsoft.AspNetCore.Mvc.Route("policy/{policyId}/issuance")]
-        public System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Anonymous>> IssuanceGet(string policyId)
+        public async System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.IActionResult> IssuanceGet(string policyId)
         {
-            return _implementation.IssuanceGetAsync(policyId);
+            var result = await _implementation.IssuanceGetAsync(policyId).ConfigureAwait(false);
+    
+            var status = result.StatusCode;
+            Microsoft.AspNetCore.Mvc.ObjectResult response = new Microsoft.AspNetCore.Mvc.ObjectResult(result.Result) { StatusCode = status };
+    
+            foreach (var header in result.Headers)
+                Request.HttpContext.Response.Headers.Add(header.Key, new Microsoft.Extensions.Primitives.StringValues(header.Value.ToArray()));
+    
+            return response;
         }
     
         /// <summary>Create issuance request</summary>
         /// <returns>OK</returns>
         [Microsoft.AspNetCore.Mvc.HttpPost, Microsoft.AspNetCore.Mvc.Route("policy/{policyId}/issuance")]
-        public System.Threading.Tasks.Task<RequestStatus> IssuancePost([Microsoft.AspNetCore.Mvc.FromBody] IssuanceRequest body, string policyId)
+        public async System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.IActionResult> IssuancePost([Microsoft.AspNetCore.Mvc.FromBody] IssuanceRequest body, string policyId)
         {
-            return _implementation.IssuancePostAsync(body, policyId);
+            var result = await _implementation.IssuancePostAsync(body, policyId).ConfigureAwait(false);
+    
+            var status = result.StatusCode;
+            Microsoft.AspNetCore.Mvc.ObjectResult response = new Microsoft.AspNetCore.Mvc.ObjectResult(result.Result) { StatusCode = status };
+    
+            foreach (var header in result.Headers)
+                Request.HttpContext.Response.Headers.Add(header.Key, new Microsoft.Extensions.Primitives.StringValues(header.Value.ToArray()));
+    
+            return response;
         }
     
         /// <summary>Get issuance request details</summary>
         /// <returns>OK</returns>
         [Microsoft.AspNetCore.Mvc.HttpGet, Microsoft.AspNetCore.Mvc.Route("policy/{policyId}/issuance/{issuanceId}")]
-        public System.Threading.Tasks.Task<RequestStatus> IssuanceGet(string policyId, string issuanceId)
+        public async System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.IActionResult> IssuanceGet(string policyId, string issuanceId)
         {
-            return _implementation.IssuanceGetAsync(policyId, issuanceId);
+            var result = await _implementation.IssuanceGetAsync(policyId, issuanceId).ConfigureAwait(false);
+    
+            var status = result.StatusCode;
+            Microsoft.AspNetCore.Mvc.ObjectResult response = new Microsoft.AspNetCore.Mvc.ObjectResult(result.Result) { StatusCode = status };
+    
+            foreach (var header in result.Headers)
+                Request.HttpContext.Response.Headers.Add(header.Key, new Microsoft.Extensions.Primitives.StringValues(header.Value.ToArray()));
+    
+            return response;
         }
     
     }
@@ -127,15 +177,15 @@ namespace PolicyExampleAPI
     {
         /// <summary>Get policy configurations</summary>
         /// <returns>OK</returns>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Anonymous2>> ConfigurationsGetAsync(string policyId);
+        System.Threading.Tasks.Task<Response<System.Collections.Generic.ICollection<ConfigurationWithStatus>>> ConfigurationsGetAsync(string policyId);
     
         /// <summary>Create policy configuration</summary>
         /// <returns>OK</returns>
-        System.Threading.Tasks.Task<RequestStatus> ConfigurationsPostAsync(Configuration body, string policyId);
+        System.Threading.Tasks.Task<Response<RequestStatus>> ConfigurationsPostAsync(Configuration body, string policyId);
     
         /// <summary>Get policy configuration details</summary>
         /// <returns>OK</returns>
-        System.Threading.Tasks.Task<RequestStatus> ConfigurationsGetAsync(string policyId, string configurationId);
+        System.Threading.Tasks.Task<Response<ConfigurationWithStatus>> ConfigurationsGetAsync(string policyId, string configurationId);
     
     }
     
@@ -152,25 +202,49 @@ namespace PolicyExampleAPI
         /// <summary>Get policy configurations</summary>
         /// <returns>OK</returns>
         [Microsoft.AspNetCore.Mvc.HttpGet, Microsoft.AspNetCore.Mvc.Route("policy/{policyId}/configurations")]
-        public System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Anonymous2>> ConfigurationsGet(string policyId)
+        public async System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.IActionResult> ConfigurationsGet(string policyId)
         {
-            return _implementation.ConfigurationsGetAsync(policyId);
+            var result = await _implementation.ConfigurationsGetAsync(policyId).ConfigureAwait(false);
+    
+            var status = result.StatusCode;
+            Microsoft.AspNetCore.Mvc.ObjectResult response = new Microsoft.AspNetCore.Mvc.ObjectResult(result.Result) { StatusCode = status };
+    
+            foreach (var header in result.Headers)
+                Request.HttpContext.Response.Headers.Add(header.Key, new Microsoft.Extensions.Primitives.StringValues(header.Value.ToArray()));
+    
+            return response;
         }
     
         /// <summary>Create policy configuration</summary>
         /// <returns>OK</returns>
         [Microsoft.AspNetCore.Mvc.HttpPost, Microsoft.AspNetCore.Mvc.Route("policy/{policyId}/configurations")]
-        public System.Threading.Tasks.Task<RequestStatus> ConfigurationsPost([Microsoft.AspNetCore.Mvc.FromBody] Configuration body, string policyId)
+        public async System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.IActionResult> ConfigurationsPost([Microsoft.AspNetCore.Mvc.FromBody] Configuration body, string policyId)
         {
-            return _implementation.ConfigurationsPostAsync(body, policyId);
+            var result = await _implementation.ConfigurationsPostAsync(body, policyId).ConfigureAwait(false);
+    
+            var status = result.StatusCode;
+            Microsoft.AspNetCore.Mvc.ObjectResult response = new Microsoft.AspNetCore.Mvc.ObjectResult(result.Result) { StatusCode = status };
+    
+            foreach (var header in result.Headers)
+                Request.HttpContext.Response.Headers.Add(header.Key, new Microsoft.Extensions.Primitives.StringValues(header.Value.ToArray()));
+    
+            return response;
         }
     
         /// <summary>Get policy configuration details</summary>
         /// <returns>OK</returns>
         [Microsoft.AspNetCore.Mvc.HttpGet, Microsoft.AspNetCore.Mvc.Route("policy/{policyId}/configurations/{configurationId}")]
-        public System.Threading.Tasks.Task<RequestStatus> ConfigurationsGet(string policyId, string configurationId)
+        public async System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.IActionResult> ConfigurationsGet(string policyId, string configurationId)
         {
-            return _implementation.ConfigurationsGetAsync(policyId, configurationId);
+            var result = await _implementation.ConfigurationsGetAsync(policyId, configurationId).ConfigureAwait(false);
+    
+            var status = result.StatusCode;
+            Microsoft.AspNetCore.Mvc.ObjectResult response = new Microsoft.AspNetCore.Mvc.ObjectResult(result.Result) { StatusCode = status };
+    
+            foreach (var header in result.Headers)
+                Request.HttpContext.Response.Headers.Add(header.Key, new Microsoft.Extensions.Primitives.StringValues(header.Value.ToArray()));
+    
+            return response;
         }
     
     }
@@ -180,11 +254,11 @@ namespace PolicyExampleAPI
     {
         /// <summary>Get policy business time</summary>
         /// <returns>OK</returns>
-        System.Threading.Tasks.Task<System.DateTimeOffset> BusinesstimeGetAsync(string policyId);
+        System.Threading.Tasks.Task<Response<System.DateTimeOffset>> BusinesstimeGetAsync(string policyId);
     
         /// <summary>Override policy business time</summary>
         /// <returns>Accepted</returns>
-        System.Threading.Tasks.Task BusinesstimePostAsync(System.DateTimeOffset? body, string policyId);
+        System.Threading.Tasks.Task<Response> BusinesstimePostAsync(System.DateTimeOffset? body, string policyId);
     
     }
     
@@ -201,17 +275,33 @@ namespace PolicyExampleAPI
         /// <summary>Get policy business time</summary>
         /// <returns>OK</returns>
         [Microsoft.AspNetCore.Mvc.HttpGet, Microsoft.AspNetCore.Mvc.Route("policy/{policyId}/businesstime")]
-        public System.Threading.Tasks.Task<System.DateTimeOffset> BusinesstimeGet(string policyId)
+        public async System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.IActionResult> BusinesstimeGet(string policyId)
         {
-            return _implementation.BusinesstimeGetAsync(policyId);
+            var result = await _implementation.BusinesstimeGetAsync(policyId).ConfigureAwait(false);
+    
+            var status = result.StatusCode;
+            Microsoft.AspNetCore.Mvc.ObjectResult response = new Microsoft.AspNetCore.Mvc.ObjectResult(result.Result) { StatusCode = status };
+    
+            foreach (var header in result.Headers)
+                Request.HttpContext.Response.Headers.Add(header.Key, new Microsoft.Extensions.Primitives.StringValues(header.Value.ToArray()));
+    
+            return response;
         }
     
         /// <summary>Override policy business time</summary>
         /// <returns>Accepted</returns>
         [Microsoft.AspNetCore.Mvc.HttpPost, Microsoft.AspNetCore.Mvc.Route("policy/{policyId}/businesstime")]
-        public System.Threading.Tasks.Task BusinesstimePost([Microsoft.AspNetCore.Mvc.FromBody] System.DateTimeOffset? body, string policyId)
+        public async System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.IActionResult> BusinesstimePost([Microsoft.AspNetCore.Mvc.FromBody] System.DateTimeOffset? body, string policyId)
         {
-            return _implementation.BusinesstimePostAsync(body, policyId);
+            var result = await _implementation.BusinesstimePostAsync(body, policyId).ConfigureAwait(false);
+    
+            var status = result.StatusCode;
+            Microsoft.AspNetCore.Mvc.ObjectResult response = new Microsoft.AspNetCore.Mvc.ObjectResult(result) { StatusCode = status };
+    
+            foreach (var header in result.Headers)
+                Request.HttpContext.Response.Headers.Add(header.Key, new Microsoft.Extensions.Primitives.StringValues(header.Value.ToArray()));
+    
+            return response;
         }
     
     }
@@ -221,15 +311,15 @@ namespace PolicyExampleAPI
     {
         /// <summary>Get policy claims</summary>
         /// <returns>OK</returns>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Claim>> ClaimGetAsync(string policyId);
+        System.Threading.Tasks.Task<Response<System.Collections.Generic.ICollection<ClaimWithStatus>>> ClaimGetAsync(string policyId);
     
         /// <summary>Submit policy claim</summary>
         /// <returns>OK</returns>
-        System.Threading.Tasks.Task ClaimPostAsync(Claim body, string policyId);
+        System.Threading.Tasks.Task<Response> ClaimPostAsync(Claim body, string policyId);
     
         /// <summary>Get policy claim details</summary>
         /// <returns>OK</returns>
-        System.Threading.Tasks.Task<Response> ClaimGetAsync(string policyId, string claimId);
+        System.Threading.Tasks.Task<Response<ClaimWithStatus>> ClaimGetAsync(string policyId, string claimId);
     
     }
     
@@ -246,25 +336,49 @@ namespace PolicyExampleAPI
         /// <summary>Get policy claims</summary>
         /// <returns>OK</returns>
         [Microsoft.AspNetCore.Mvc.HttpGet, Microsoft.AspNetCore.Mvc.Route("policy/{policyId}/claim")]
-        public System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Claim>> ClaimGet(string policyId)
+        public async System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.IActionResult> ClaimGet(string policyId)
         {
-            return _implementation.ClaimGetAsync(policyId);
+            var result = await _implementation.ClaimGetAsync(policyId).ConfigureAwait(false);
+    
+            var status = result.StatusCode;
+            Microsoft.AspNetCore.Mvc.ObjectResult response = new Microsoft.AspNetCore.Mvc.ObjectResult(result.Result) { StatusCode = status };
+    
+            foreach (var header in result.Headers)
+                Request.HttpContext.Response.Headers.Add(header.Key, new Microsoft.Extensions.Primitives.StringValues(header.Value.ToArray()));
+    
+            return response;
         }
     
         /// <summary>Submit policy claim</summary>
         /// <returns>OK</returns>
         [Microsoft.AspNetCore.Mvc.HttpPost, Microsoft.AspNetCore.Mvc.Route("policy/{policyId}/claim")]
-        public System.Threading.Tasks.Task ClaimPost([Microsoft.AspNetCore.Mvc.FromBody] Claim body, string policyId)
+        public async System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.IActionResult> ClaimPost([Microsoft.AspNetCore.Mvc.FromBody] Claim body, string policyId)
         {
-            return _implementation.ClaimPostAsync(body, policyId);
+            var result = await _implementation.ClaimPostAsync(body, policyId).ConfigureAwait(false);
+    
+            var status = result.StatusCode;
+            Microsoft.AspNetCore.Mvc.ObjectResult response = new Microsoft.AspNetCore.Mvc.ObjectResult(result) { StatusCode = status };
+    
+            foreach (var header in result.Headers)
+                Request.HttpContext.Response.Headers.Add(header.Key, new Microsoft.Extensions.Primitives.StringValues(header.Value.ToArray()));
+    
+            return response;
         }
     
         /// <summary>Get policy claim details</summary>
         /// <returns>OK</returns>
         [Microsoft.AspNetCore.Mvc.HttpGet, Microsoft.AspNetCore.Mvc.Route("policy/{policyId}/claim/{claimId}")]
-        public System.Threading.Tasks.Task<Response> ClaimGet(string policyId, string claimId)
+        public async System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.IActionResult> ClaimGet(string policyId, string claimId)
         {
-            return _implementation.ClaimGetAsync(policyId, claimId);
+            var result = await _implementation.ClaimGetAsync(policyId, claimId).ConfigureAwait(false);
+    
+            var status = result.StatusCode;
+            Microsoft.AspNetCore.Mvc.ObjectResult response = new Microsoft.AspNetCore.Mvc.ObjectResult(result.Result) { StatusCode = status };
+    
+            foreach (var header in result.Headers)
+                Request.HttpContext.Response.Headers.Add(header.Key, new Microsoft.Extensions.Primitives.StringValues(header.Value.ToArray()));
+    
+            return response;
         }
     
     }
@@ -297,11 +411,12 @@ namespace PolicyExampleAPI
         [Newtonsoft.Json.JsonProperty("issued", Required = Newtonsoft.Json.Required.Always)]
         public bool Issued { get; set; }
     
-        [Newtonsoft.Json.JsonProperty("duration", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTimeOffset? Duration { get; set; }
+        [Newtonsoft.Json.JsonProperty("duration", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [System.ComponentModel.DataAnnotations.Range(0D, double.MaxValue)]
+        public long Duration { get; set; }
     
-        [Newtonsoft.Json.JsonProperty("issueDate", Required = Newtonsoft.Json.Required.Always)]
-        [System.ComponentModel.DataAnnotations.Required]
+        [Newtonsoft.Json.JsonProperty("issueDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [System.ComponentModel.DataAnnotations.StringLength(int.MaxValue, MinimumLength = 1)]
         public System.DateTimeOffset IssueDate { get; set; }
     
         [Newtonsoft.Json.JsonProperty("expiryDate", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
@@ -310,32 +425,17 @@ namespace PolicyExampleAPI
         [Newtonsoft.Json.JsonProperty("isExpired", Required = Newtonsoft.Json.Required.Always)]
         public bool IsExpired { get; set; }
     
-        [Newtonsoft.Json.JsonProperty("amount", Required = Newtonsoft.Json.Required.Always)]
-        public double Amount { get; set; }
+        [Newtonsoft.Json.JsonProperty("amount", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [System.ComponentModel.DataAnnotations.Range(1, int.MaxValue)]
+        public int Amount { get; set; }
     
-        [Newtonsoft.Json.JsonProperty("businessTime", Required = Newtonsoft.Json.Required.Always)]
-        [System.ComponentModel.DataAnnotations.Required]
-        public string BusinessTime { get; set; }
+        [Newtonsoft.Json.JsonProperty("businessTime", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [System.ComponentModel.DataAnnotations.StringLength(int.MaxValue, MinimumLength = 1)]
+        public System.DateTimeOffset BusinessTime { get; set; }
     
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-    
-        [Newtonsoft.Json.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties; }
-            set { _additionalProperties = value; }
-        }
-    
-    
-    }
-    
-    /// <summary>Duration of the policy, in seconds</summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.2.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class Duration 
-    {
-        [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        [System.ComponentModel.DataAnnotations.Range(1D, double.MaxValue)]
-        public long Id { get; set; }
+        [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.Always)]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string Id { get; set; }
     
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
     
@@ -409,7 +509,8 @@ namespace PolicyExampleAPI
         public int Amount { get; set; }
     
         [Newtonsoft.Json.JsonProperty("duration", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Duration Duration { get; set; }
+        [System.ComponentModel.DataAnnotations.Range(0D, double.MaxValue)]
+        public long Duration { get; set; }
     
         [Newtonsoft.Json.JsonProperty("policyId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public string PolicyId { get; set; }
@@ -449,8 +550,9 @@ namespace PolicyExampleAPI
     
     }
     
+    /// <summary>Issuance request with its status </summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.2.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class Anonymous 
+    public partial class IssuanceWithStatus 
     {
         [Newtonsoft.Json.JsonProperty("issuance", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public IssuanceRequest Issuance { get; set; }
@@ -470,11 +572,12 @@ namespace PolicyExampleAPI
     
     }
     
+    /// <summary>Configuration request details with its status</summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.2.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class Anonymous2 
+    public partial class ConfigurationWithStatus 
     {
-        [Newtonsoft.Json.JsonProperty("configurationRequest", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Configuration ConfigurationRequest { get; set; }
+        [Newtonsoft.Json.JsonProperty("configuration", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public Configuration Configuration { get; set; }
     
         [Newtonsoft.Json.JsonProperty("status", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public RequestStatus Status { get; set; }
@@ -491,8 +594,9 @@ namespace PolicyExampleAPI
     
     }
     
+    /// <summary>Claim information with its status</summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.2.1.0 (Newtonsoft.Json v12.0.0.0)")]
-    public partial class Response 
+    public partial class ClaimWithStatus 
     {
         [Newtonsoft.Json.JsonProperty("claim", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public Claim Claim { get; set; }
@@ -510,6 +614,32 @@ namespace PolicyExampleAPI
         }
     
     
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.8.2.0 (NJsonSchema v10.2.1.0 (Newtonsoft.Json v12.0.0.0))")]
+    public partial class Response
+    {
+        public int StatusCode { get; private set; }
+
+        public System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> Headers { get; private set; }
+        
+        public Response(int statusCode, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers) 
+        {
+            StatusCode = statusCode; 
+            Headers = headers;
+        }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.8.2.0 (NJsonSchema v10.2.1.0 (Newtonsoft.Json v12.0.0.0))")]
+    public partial class Response<TResult> : Response
+    {
+        public TResult Result { get; private set; }
+        
+        public Response(int statusCode, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, TResult result) 
+            : base(statusCode, headers)
+        {
+            Result = result;
+        }
     }
 
 }

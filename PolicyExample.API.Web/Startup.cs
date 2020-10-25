@@ -15,6 +15,8 @@ namespace PolicyExample.API.Web
 {
     public class Startup
     {
+        private bool _isDevelopment;
+
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
@@ -30,6 +32,16 @@ namespace PolicyExample.API.Web
             services.AddTransient<IIssuanceController, IssuanceControllerLogic>();
             services.AddTransient<IPolicyController, PolicyControllerLogic>();
             services.AddTransient<IBusinessTimeController, BusinessTimeControllerLogic>();
+
+            if (_isDevelopment)
+            {
+                services.AddCors(o => o.AddPolicy("Enable CORS for everybody", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
+                }));
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -38,6 +50,7 @@ namespace PolicyExample.API.Web
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                _isDevelopment = true;
             }
 
             app.UseRouting();

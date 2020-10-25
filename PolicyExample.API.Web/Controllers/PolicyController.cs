@@ -1,72 +1,82 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using PolicyExampleAPI;
 
 namespace PolicyExample.API.Web.Controllers
 {
+    
     public class PolicyControllerLogic:IPolicyController
     {
-        public Task<ICollection<PolicyState>> PolicyGetAsync()
+        public Task<Response<ICollection<PolicyState>>> PolicyGetAsync()
         {
-            throw new System.NotImplementedException();
+            var state = new PolicyState()
+            {
+                Amount = 100000,
+                BusinessTime = DateTimeOffset.Now,
+                Duration = 100,
+                Id = "1"
+            };
+            var response = new Response<ICollection<PolicyState>>(200,new Dictionary<string, IEnumerable<string>>(), new []{state});
+            return Task.FromResult(response);
         }
 
-        public Task<string> PolicyPostAsync()
+        public Task<Response<string>> PolicyPostAsync()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
-        public Task<PolicyState> PolicyGetAsync(string policyId)
+        public Task<Response<PolicyState>> PolicyGetAsync(string policyId)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 
     public class IssuanceControllerLogic : IIssuanceController
     {
-        public Task<ICollection<Anonymous>> IssuanceGetAsync(string policyId)
+        public Task<Response<ICollection<IssuanceWithStatus>>> IssuanceGetAsync(string policyId)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
-        public Task<RequestStatus> IssuancePostAsync(IssuanceRequest body, string policyId)
+        public Task<Response<RequestStatus>> IssuancePostAsync(IssuanceRequest body, string policyId)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
-        public Task<RequestStatus> IssuanceGetAsync(string policyId, string issuanceId)
+        public Task<Response<IssuanceWithStatus>> IssuanceGetAsync(string policyId, string issuanceId)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 
     public class ConfigurationControllerLogic : IConfigurationController
     {
-        public Task<ICollection<Anonymous2>> ConfigurationsGetAsync(string policyId)
+        public Task<Response<ICollection<ConfigurationWithStatus>>> ConfigurationsGetAsync(string policyId)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
-        public Task<RequestStatus> ConfigurationsPostAsync(Configuration body, string policyId)
+        public Task<Response<RequestStatus>> ConfigurationsPostAsync(Configuration body, string policyId)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
-        public Task<RequestStatus> ConfigurationsGetAsync(string policyId, string configurationId)
+        public Task<Response<ConfigurationWithStatus>> ConfigurationsGetAsync(string policyId, string configurationId)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 
     public class BusinessTimeControllerLogic : IBusinessTimeController
     {
-        public Task<DateTimeOffset> BusinesstimeGetAsync(string policyId)
+        public Task<Response<DateTimeOffset>> BusinesstimeGetAsync(string policyId)
         {
             throw new NotImplementedException();
         }
 
-        public Task BusinesstimePostAsync(DateTimeOffset? body, string policyId)
+        public Task<Response> BusinesstimePostAsync(DateTimeOffset? body, string policyId)
         {
             throw new NotImplementedException();
         }
@@ -74,17 +84,17 @@ namespace PolicyExample.API.Web.Controllers
 
     public class ClaimsControllerLogic : IClaimsController
     {
-        public Task<ICollection<Claim>> ClaimGetAsync(string policyId)
+        public Task<Response<ICollection<ClaimWithStatus>>> ClaimGetAsync(string policyId)
         {
             throw new NotImplementedException();
         }
 
-        public Task ClaimPostAsync(Claim body, string policyId)
+        public Task<Response> ClaimPostAsync(Claim body, string policyId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Response> ClaimGetAsync(string policyId, string claimId)
+        public Task<Response<ClaimWithStatus>> ClaimGetAsync(string policyId, string claimId)
         {
             throw new NotImplementedException();
         }
