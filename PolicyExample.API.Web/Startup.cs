@@ -17,11 +17,21 @@ namespace PolicyExample.API.Web
     {
         private bool _isDevelopment;
 
+        private const string OpenApiWebEditorCorsPolicyName = "AllowOpenAPIWebEditors";
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            var generatedAssembly = typeof(PolicyController).Assembly;
+            
+            services.AddCors(o => o.AddPolicy(OpenApiWebEditorCorsPolicyName, builder =>
+            {
+                builder.WithOrigins("https://covergo.stoplight.io",
+                                    "https://editor.swagger.io")
+                       .AllowAnyHeader()
+                       .AllowAnyMethod();
+            }));
+
+                var generatedAssembly = typeof(PolicyController).Assembly;
             services
                 .AddControllers()
                 .AddApplicationPart(generatedAssembly)
@@ -33,15 +43,8 @@ namespace PolicyExample.API.Web
             services.AddTransient<IPolicyController, PolicyControllerLogic>();
             services.AddTransient<IBusinessTimeController, BusinessTimeControllerLogic>();
 
-            if (_isDevelopment)
-            {
-                services.AddCors(o => o.AddPolicy("Enable CORS for everybody", builder =>
-                {
-                    builder.AllowAnyOrigin()
-                           .AllowAnyMethod()
-                           .AllowAnyHeader();
-                }));
-            }
+          
+            services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,16 +53,18 @@ namespace PolicyExample.API.Web
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                _isDevelopment = true;
             }
 
             app.UseRouting();
-
+            app.UseCors();
+            app.UseOptions();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGet("/", async context => { await context.Response.WriteAsync("Hello World!"); });
-                endpoints.MapControllers();
+                endpoints.MapControllers().RequireCors(OpenApiWebEditorCorsPolicyName);
             });
+            
+           
         }
     }
 }
