@@ -48,6 +48,20 @@ namespace PolicyExample.Tests
                 ");
             var value = engine.GetValue("result");
             value.ToObject().As<double>().Should().Be(calculator.Add(1,2));
+        }  
+        
+        [Fact]
+        public void Execute_Method_from_external_object_and_return_value_without_function()
+        {
+            var calculator = new TestCalculator();
+            
+            var engine = new Engine().SetValue("calculator", calculator);
+    
+            engine.Execute(@"
+                 calculator.Add(1,2);
+                ");
+            var value = engine.GetCompletionValue();
+            value.ToObject().As<double>().Should().Be(calculator.Add(1,2));
         }
     }
 }
