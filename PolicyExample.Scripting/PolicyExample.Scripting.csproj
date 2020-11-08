@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
@@ -10,10 +11,6 @@
 
     <ItemGroup>
       <PackageReference Include="Jint" Version="2.11.58" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="GraphLogic" />
     </ItemGroup>
 
 </Project>

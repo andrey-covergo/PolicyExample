@@ -22,7 +22,7 @@ namespace PolicyExample.Scripting.Jint
             _engine.SetValue("context", jintContext);
             _engine.Execute(script.JavaScriptCode);
             var result = _engine.GetCompletionValue().ToObject();
-            return Task.FromResult<IRunResult>(new ExecutionSuccess() {Id = runId, Result = result});
+            return Task.FromResult<IRunResult>(new ScriptExecutionSuccess() {Id = runId, Result = result});
         }
     }
 }

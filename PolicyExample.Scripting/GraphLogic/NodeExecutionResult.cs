@@ -1,12 +1,10 @@
-using PolicyExample.Scripting.Abstractions;
-
-namespace PolicyExample.Scripting
+namespace PolicyExample.Scripting.GraphLogic
 {
     public class NodeExecutionResult
     {
         public string CorrelationId { get; }
         public string NodeId { get; }
         public string Message { get; protected set; }
-        public ILogicNode[] Trace {get;}
+        public LogicNode[] Trace {get;}
     }
 }
