@@ -10,7 +10,7 @@ namespace PolicyExample.Scripting.GraphLogic
     public class LogicNode
     {
         public LogicNode Parent { get; set; }
-        public List<LogicNode> Children { get; set; }
+        public List<LogicNode> Children { get;  } = new List<LogicNode>();
         public string Name { get; set; }
         public string Id { get; set; }
 
@@ -18,13 +18,18 @@ namespace PolicyExample.Scripting.GraphLogic
         {
             return Task.FromResult<NodeExecutionResult>(ExecutionSuccessAndContinue.Instance);
         }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 
     public class NodeVisitResult
     {
         public LogicNode Node { get; set; }
         public NodeExecutionResult Result { get; set; }
-        public LogicNode NextNode { get; set; }
+        public LogicNode? NextNode { get; set; }
     }
     public interface IExecutionFlow
     {
@@ -32,29 +37,48 @@ namespace PolicyExample.Scripting.GraphLogic
         Task<NodeVisitResult> Visit(LogicNode node);
     }
 
-    public class SequencedExecutionFlow:IExecutionFlow
+    public class OrderedExecutionFlow:IExecutionFlow
     {
         public LogicNode? PreviousNode { get; }
-        public async Task<NodeVisitResult> Visit(LogicNode node)
+        public LogicNode? CurrentNode { get; }
+        private Stack<LogicNode> _visitHistory = new Stack<LogicNode>();
+        public async Task<NodeVisitResult> Visit(LogicNode? node)
         {
-            var result = await node.Execute(this);
-            switch (result)
+            if (node == null)
+                return new NodeVisitResult() {Node = node};
+
+            LogicNode? NotVisitedChild()
             {
-                case ExecutionSuccess _:
+                return node.Children.FirstOrDefault(c => !_visitHistory.Contains(c));
+            }
+
+            if (_visitHistory.Contains(node))
+            {
+                var notVisitedChild = NotVisitedChild();
+                
+                if(notVisitedChild != null)
+                    return await Visit(notVisitedChild);
+
+                return await Visit(node.Parent);
+            }
+            
+            _visitHistory.Push(node);
+            var executionResult = await node.Execute(this);
+            
+            switch (executionResult)
+            {
+                case ExecutionSuccessAndContinue _:
                 {
-                    //sequenced flow
-                    if (!node.Children.Any())
-                        return new NodeVisitResult() {NextNode = node.Parent, Node = node, Result = result};
+
+                    var notVisitedChild = node.Children.FirstOrDefault(c => !_visitHistory.Contains(c));
                     
-                    return new NodeVisitResult() {NextNode = node.Children., Node = node, Result = result};
-                }
-                case ExecutionSuccessAndRedirect _:
-                {
-                    //node-decided flow
-                    if(node.Children.Any())
-                    break;
+                    if(notVisitedChild != null)
+                        return new NodeVisitResult() {NextNode = notVisitedChild, Node = node, Result = executionResult};
+                    
+                    return new NodeVisitResult() {NextNode = node.Parent, Node = node, Result = executionResult};
                 }
             }
+            throw new NotImplementedException();
         }
     }
     public class LogicGraph
@@ -62,9 +86,22 @@ namespace PolicyExample.Scripting.GraphLogic
         public LogicNode Root { get; set; }
         public IExecutionFlow ExecutionFlow { get; set; }
 
-        IAsyncEnumerable<NodeVisitResult> Run()
+        public async IAsyncEnumerable<NodeVisitResult> Run()
         {
-            throw new NotImplementedException(); 
+            var currentNode = Root;
+            while (true)
+            {
+                var res = await ExecutionFlow.Visit(currentNode);
+
+                if (res.NextNode == null)
+                {
+                    //yield return res;
+                    yield break;
+                }
+
+                yield return res;
+                currentNode = res.NextNode;
+            }
         }
     }
 }
