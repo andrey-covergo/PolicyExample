@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace PolicyExample.Scripting
+namespace PolicyExample.Scripting.Abstractions
 {
     /// <summary>
     /// Provides a new context to a script

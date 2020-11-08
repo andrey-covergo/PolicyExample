@@ -1,6 +1,4 @@
-using System.Threading.Tasks;
-
-namespace PolicyExample.Scripting
+namespace PolicyExample.Scripting.Abstractions
 {
     public interface IScript
     {

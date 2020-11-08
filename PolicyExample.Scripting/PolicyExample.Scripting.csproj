@@ -12,4 +12,8 @@
       <PackageReference Include="Jint" Version="2.11.58" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="GraphLogic" />
+    </ItemGroup>
+
 </Project>

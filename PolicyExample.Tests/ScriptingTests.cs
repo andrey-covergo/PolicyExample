@@ -1,6 +1,8 @@
 using System.Threading.Tasks;
 using FluentAssertions;
 using PolicyExample.Scripting;
+using PolicyExample.Scripting.Abstractions;
+using PolicyExample.Scripting.Jint;
 using Xunit;
 
 namespace PolicyExample.Tests

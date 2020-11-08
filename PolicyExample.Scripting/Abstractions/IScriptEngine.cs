@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace PolicyExample.Scripting
+namespace PolicyExample.Scripting.Abstractions
 {
     public interface IScriptEngine<in TScript> where TScript:IScript
     {

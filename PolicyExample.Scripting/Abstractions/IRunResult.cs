@@ -1,6 +1,4 @@
-using System.Runtime.Serialization;
-
-namespace PolicyExample.Scripting
+namespace PolicyExample.Scripting.Abstractions
 {
     public interface IRunResult
     {

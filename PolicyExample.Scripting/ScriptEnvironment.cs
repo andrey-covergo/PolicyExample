@@ -1,6 +1,6 @@
-using PolicyExample.Scripting;
+using PolicyExample.Scripting.Abstractions;
 
-namespace PolicyExample.Tests
+namespace PolicyExample.Scripting
 {
     public class ScriptEnvironment<T>:IScriptEnvironment<T>
     {

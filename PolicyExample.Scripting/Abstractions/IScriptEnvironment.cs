@@ -1,4 +1,4 @@
-namespace PolicyExample.Scripting
+namespace PolicyExample.Scripting.Abstractions
 {
     /// <summary>
     /// T expects a script will call any public method or property T exposes

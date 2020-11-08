@@ -1,4 +1,4 @@
-namespace PolicyExample.Tests
+namespace PolicyExample.Scripting.Jint
 {
     public class JintScript : IJintScript
     {
@@ -8,5 +8,9 @@ namespace PolicyExample.Tests
         }
 
         public string JavaScriptCode { get;  }
+        string ContextTypeName { get; }
+        int ContextVersion { get; }
+        string EngineVersion { get; }
+        string ContextSchema { get; }
     }
 }

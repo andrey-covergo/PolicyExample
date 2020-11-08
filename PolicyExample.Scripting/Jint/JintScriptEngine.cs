@@ -1,9 +1,9 @@
 using System;
 using System.Threading.Tasks;
 using Jint;
-using PolicyExample.Scripting;
+using PolicyExample.Scripting.Abstractions;
 
-namespace PolicyExample.Tests
+namespace PolicyExample.Scripting.Jint
 {
     public class JintScriptEngine:IScriptEngine<IJintScript>
     {
@@ -15,6 +15,8 @@ namespace PolicyExample.Tests
         }
         public Task<IRunResult> Run<T>(IJintScript script, IScriptEnvironment<T> externalEnvironment)
         {
+            //TODO: add checks for script context type, version and environment
+
             var runId = Guid.NewGuid().ToString();
             var jintContext = externalEnvironment.Context;
             _engine.SetValue("context", jintContext);

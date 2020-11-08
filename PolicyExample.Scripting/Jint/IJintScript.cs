@@ -1,9 +1,10 @@
-using PolicyExample.Scripting;
+using PolicyExample.Scripting.Abstractions;
 
-namespace PolicyExample.Tests
+namespace PolicyExample.Scripting.Jint
 {
     public interface IJintScript : IScript
     {
+
         string JavaScriptCode { get; }
     }
 }

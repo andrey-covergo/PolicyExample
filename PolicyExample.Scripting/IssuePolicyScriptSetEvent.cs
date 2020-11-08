@@ -1,7 +1,7 @@
 using System;
 using PolicyExample.Domain.Events;
 
-namespace PolicyExample.Tests
+namespace PolicyExample.Scripting
 {
     public class IssuePolicyScriptSetEvent : PolicyEvent
     {
