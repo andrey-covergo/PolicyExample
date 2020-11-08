@@ -11,6 +11,7 @@
     <ItemGroup>
         <PackageReference Include="Bogus" Version="31.0.3" />
         <PackageReference Include="FluentAssertions" Version="5.10.3" />
+        <PackageReference Include="Jint" Version="2.11.58" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
         <PackageReference Include="xunit" Version="2.4.0" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
@@ -20,6 +21,7 @@
     <ItemGroup>
       <ProjectReference Include="..\PolicyExample.Abstractions\PolicyExample.Abstractions.csproj" />
       <ProjectReference Include="..\PolicyExample.Domain\PolicyExample.Domain.csproj" />
+      <ProjectReference Include="..\PolicyExample.Scripting\PolicyExample.Scripting.csproj" />
     </ItemGroup>
 
 </Project>

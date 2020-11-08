@@ -1,0 +1,53 @@
+using FluentAssertions;
+using Jint;
+using Xunit;
+using Xunit.Abstractions;
+
+namespace PolicyExample.Tests
+{
+    public class JintPlayground
+    {
+        private readonly ITestOutputHelper _output;
+
+        public JintPlayground(ITestOutputHelper output)
+        {
+            _output = output;
+        }
+        [Fact]
+        public void LogFromJint()
+        {
+            var engine = new Engine()
+                    .SetValue("log", _output)
+                ;
+    
+            engine.Execute(@"
+                  function hello() { 
+                    log.writeLine('Hello World');
+                  };
+                  
+                  hello();
+                ");
+        }
+
+        class TestCalculator
+        {
+            public int Add(int a, int b) => a + b;
+        }
+        [Fact]
+        public void Execute_Method_from_external_object_and_return_value()
+        {
+            var calculator = new TestCalculator();
+            
+            var engine = new Engine().SetValue("calculator", calculator);
+    
+            engine.Execute(@"
+                  function calc() { 
+                     return calculator.Add(1,2);
+                  };
+                  var result = calc();
+                ");
+            var value = engine.GetValue("result");
+            value.ToObject().As<double>().Should().Be(calculator.Add(1,2));
+        }
+    }
+}
