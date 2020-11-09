@@ -33,7 +33,7 @@ namespace PolicyExample.Tests
                 trace.Add(visit);
             }
 
-            trace.Select(v => v.Node.Name).Should().BeEquivalentTo("root","nodeA", "nodeAA", "nodeB");
+            trace.Select(v => v.Node.Name).Should().Equal("root","nodeA", "nodeAA", "nodeB");
         }
 
         class TestLogicNode : LogicNode
@@ -72,7 +72,7 @@ namespace PolicyExample.Tests
                 trace.Add(visit);
             }
 
-            trace.Select(v => v.Node.Name).Should().BeEquivalentTo("root","nodeA", "nodeB");
+            trace.Select(v => v.Node.Name).Should().Equal("root","nodeA", "nodeB");
         }
         
         [Fact]
@@ -99,7 +99,7 @@ namespace PolicyExample.Tests
                 trace.Add(visit);
             }
 
-            trace.Select(v => v.Node.Name).Should().BeEquivalentTo("root","nodeA");
+            trace.Select(v => v.Node.Name).Should().Equal("root","nodeA");
 
             trace.Last().Result.As<ExecutionSuccessAndStop>().Result.Should().Be(1);
         }

@@ -16,17 +16,17 @@ namespace PolicyExample.Scripting.GraphLogic
         {
             _node = node;
         }
-        public void StopFlow()
+        public void Stop()
         {
             Result = ExecutionSuccessAndStop.Instance;
         }
 
-        public void RedirectFlowToParent()
+        public void RedirectToParent()
         {
             Result = new ExecutionSuccessAndRedirect(_node.Parent);;
         }
         
-        public bool RedirectFlowToChild(int index)
+        public bool RedirectToChild(int index)
         {
             if (_node.Children.Count >= index)
             {

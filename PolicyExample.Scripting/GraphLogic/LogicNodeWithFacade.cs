@@ -4,20 +4,14 @@ namespace PolicyExample.Scripting.GraphLogic
 {
     public class LogicNodeWithFacade : LogicNode
     {
-        private readonly NodeBehaviorFacade _facade;
+        protected readonly NodeBehaviorFacade Facade;
         public LogicNodeWithFacade()
         {   
-            _facade = new NodeBehaviorFacade(this);
-        }
-
-        protected virtual void Execute(IExecutionFlow flow, NodeBehaviorFacade facade)
-        {
-            
+            Facade = new NodeBehaviorFacade(this);
         }
         public override Task<NodeExecutionResult> Execute(IExecutionFlow flow)
         {
-            Execute(flow, _facade);
-            return _facade.Result == null ? base.Execute(flow) : Task.FromResult(_facade.Result);
+            return Facade.Result == null ? base.Execute(flow) : Task.FromResult(Facade.Result);
         }
     }
 }
