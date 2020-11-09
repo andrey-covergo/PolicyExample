@@ -28,24 +28,22 @@ namespace PolicyExample.Scripting.GraphLogic
     public class NodeVisitResult
     {
         public LogicNode Node { get; set; }
-        public NodeExecutionResult Result { get; set; }
+        public NodeExecutionResult? Result { get; set; }
         public LogicNode? NextNode { get; set; }
+
     }
     public interface IExecutionFlow
     {
-        LogicNode? CurrentNode { get; }
         Task<NodeVisitResult> Visit(LogicNode node);
     }
 
     public class OrderedExecutionFlow:IExecutionFlow
     {
-        public LogicNode? PreviousNode { get; }
-        public LogicNode? CurrentNode { get; }
-        private Stack<LogicNode> _visitHistory = new Stack<LogicNode>();
+        private readonly Stack<LogicNode> _visitHistory = new Stack<LogicNode>();
         public async Task<NodeVisitResult> Visit(LogicNode? node)
         {
             if (node == null)
-                return new NodeVisitResult() {Node = node};
+                return new NodeVisitResult();
 
             LogicNode? NotVisitedChild()
             {
@@ -67,15 +65,24 @@ namespace PolicyExample.Scripting.GraphLogic
             
             switch (executionResult)
             {
-                case ExecutionSuccessAndContinue _:
+                case ExecutionSuccessAndContinue cont:
                 {
 
                     var notVisitedChild = node.Children.FirstOrDefault(c => !_visitHistory.Contains(c));
                     
                     if(notVisitedChild != null)
-                        return new NodeVisitResult() {NextNode = notVisitedChild, Node = node, Result = executionResult};
+                        return new NodeVisitResult() {NextNode = notVisitedChild, Node = node, Result = cont};
                     
-                    return new NodeVisitResult() {NextNode = node.Parent, Node = node, Result = executionResult};
+                    return new NodeVisitResult() {NextNode = node.Parent, Node = node, Result = cont};
+                }
+
+                case ExecutionSuccessAndRedirect redirect:
+                {
+                    return new NodeVisitResult() {NextNode = redirect.NextNode, Node = node, Result = redirect};
+                }
+                case ExecutionSuccessAndStop stop:
+                {
+                    return new NodeVisitResult() {Node = node, Result = stop};
                 }
             }
             throw new NotImplementedException();
@@ -93,9 +100,8 @@ namespace PolicyExample.Scripting.GraphLogic
             {
                 var res = await ExecutionFlow.Visit(currentNode);
 
-                if (res.NextNode == null)
+                if (res.NextNode == null && res.Result == null)
                 {
-                    //yield return res;
                     yield break;
                 }
 

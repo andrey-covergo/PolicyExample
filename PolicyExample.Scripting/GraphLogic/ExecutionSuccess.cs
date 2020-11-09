@@ -4,9 +4,4 @@ namespace PolicyExample.Scripting.GraphLogic
     {
         
     }
-    
-    public class ExecutionSuccessAndRedirect : NodeExecutionResult
-    {
-        
-    }
 }
