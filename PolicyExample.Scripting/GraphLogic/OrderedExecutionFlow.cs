@@ -5,38 +5,6 @@ using System.Threading.Tasks;
 
 namespace PolicyExample.Scripting.GraphLogic
 {
-    
-    //TODO: find a proper graph library
-    public class LogicNode
-    {
-        public LogicNode Parent { get; set; }
-        public List<LogicNode> Children { get;  } = new List<LogicNode>();
-        public string Name { get; set; }
-        public string Id { get; set; }
-
-        public virtual Task<NodeExecutionResult> Execute(IExecutionFlow flow)
-        {
-            return Task.FromResult<NodeExecutionResult>(ExecutionSuccessAndContinue.Instance);
-        }
-
-        public override string ToString()
-        {
-            return Name;
-        }
-    }
-
-    public class NodeVisitResult
-    {
-        public LogicNode Node { get; set; }
-        public NodeExecutionResult? Result { get; set; }
-        public LogicNode? NextNode { get; set; }
-
-    }
-    public interface IExecutionFlow
-    {
-        Task<NodeVisitResult> Visit(LogicNode node);
-    }
-
     public class OrderedExecutionFlow:IExecutionFlow
     {
         private readonly Stack<LogicNode> _visitHistory = new Stack<LogicNode>();
@@ -86,28 +54,6 @@ namespace PolicyExample.Scripting.GraphLogic
                 }
             }
             throw new NotImplementedException();
-        }
-    }
-    public class LogicGraph
-    {
-        public LogicNode Root { get; set; }
-        public IExecutionFlow ExecutionFlow { get; set; }
-
-        public async IAsyncEnumerable<NodeVisitResult> Run()
-        {
-            var currentNode = Root;
-            while (true)
-            {
-                var res = await ExecutionFlow.Visit(currentNode);
-
-                if (res.NextNode == null && res.Result == null)
-                {
-                    yield break;
-                }
-
-                yield return res;
-                currentNode = res.NextNode;
-            }
         }
     }
 }
