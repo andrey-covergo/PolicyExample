@@ -1,9 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace PolicyExample.Scripting.GraphLogic
 {
-    
     //TODO: find a proper graph library
     public class LogicNode
     {

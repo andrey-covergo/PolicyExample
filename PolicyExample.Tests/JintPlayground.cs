@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Jint;
+using Jint.Runtime;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -32,6 +33,7 @@ namespace PolicyExample.Tests
         class TestCalculator
         {
             public int Add(int a, int b) => a + b;
+            internal int InternalAdd(int a, int b) => Add(a,b);
         }
         [Fact]
         public void Execute_Method_from_external_object_and_return_value()
@@ -62,6 +64,19 @@ namespace PolicyExample.Tests
                 ");
             var value = engine.GetCompletionValue();
             value.ToObject().As<double>().Should().Be(calculator.Add(1,2));
+        }
+        
+        [Fact]
+        public void Cannot_Execute_internal_Method_from_external_object()
+        {
+            var calculator = new TestCalculator();
+            
+            var engine = new Engine().SetValue("calculator", calculator);
+    
+            engine.Invoking( e => e.Execute(@"
+                 calculator.InternalAdd(1,2);
+                ")).Should().Throw<JavaScriptException>().WithMessage("Object has no method 'InternalAdd'");
+           
         }
     }
 }

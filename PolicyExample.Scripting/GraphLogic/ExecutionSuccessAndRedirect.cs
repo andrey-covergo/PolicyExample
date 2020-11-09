@@ -2,6 +2,11 @@ namespace PolicyExample.Scripting.GraphLogic
 {
     public class ExecutionSuccessAndRedirect : NodeExecutionResult
     {
-        public LogicNode NextNode { get; set; }
+        public ExecutionSuccessAndRedirect(LogicNode nextNode)
+        {
+            NextNode = nextNode;
+        }
+
+        public LogicNode NextNode { get; }
     }
 }

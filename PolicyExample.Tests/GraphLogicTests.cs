@@ -50,7 +50,7 @@ namespace PolicyExample.Tests
         {
             var root = new LogicNode() {Name = "root"};
             var childARedirectParent = new TestLogicNode() {Name = "nodeA", Parent = root, 
-                Behavior = f=> new ExecutionSuccessAndRedirect(){NextNode = root}};
+                Behavior = f=> new ExecutionSuccessAndRedirect(root)};
             
             var childB = new LogicNode() {Name = "nodeB", Parent = root};
             root.Children.Add(childARedirectParent);
