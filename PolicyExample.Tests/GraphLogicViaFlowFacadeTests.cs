@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using PolicyExample.Scripting;
 using PolicyExample.Scripting.GraphLogic;
 using Xunit;
 
@@ -13,9 +14,36 @@ namespace PolicyExample.Tests
     {
 
         [Fact]
-        public async Task Given_graph_with_jint_node_raising_an_error_When_execute_Then_will_follow_jint_stop_command()
+        public async Task Given_graph_with_jint_node_raising_an_error_When_execute_Then_flow_stops()
         {
-            throw new NotImplementedException();            
+            var root = new LogicNode() {Name = "root"};
+            var childA = new JintLogicNode()
+            {
+                Name = "nodeA", Parent = root,
+                JavaScript = @"bad script"
+            };
+            var childB = new LogicNode() {Name = "nodeB", Parent = root};
+            root.Children.Add(childA);
+            root.Children.Add(childB);
+
+            var nodeAA = new LogicNode() {Name = "nodeAA", Parent = childA};
+            childA.Children.Add(nodeAA);
+            
+            var graph = new LogicGraph()
+            {
+                Root = root, ExecutionFlow = new JintOrderedExecutionFlow()
+            };
+
+            var trace = new List<NodeVisitResult>();
+            await foreach (var visit in graph.Run())
+            {
+                trace.Add(visit);
+            }
+
+            trace.Select(v => v.Node.Name).Should().Equal("root","nodeA");
+
+            var error = trace.Last().Result.Should().BeOfType<ExecutionError>().Subject;
+            error.Message.Should().Contain("Unexpected identifier");
         }
             
         [Fact]

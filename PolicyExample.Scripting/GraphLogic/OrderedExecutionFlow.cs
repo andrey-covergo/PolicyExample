@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Jint;
+using Jint.Parser.Ast;
 
 namespace PolicyExample.Scripting.GraphLogic
 {
@@ -17,8 +18,15 @@ namespace PolicyExample.Scripting.GraphLogic
         {
             if (JavaScript != null)
             {
-                engine.SetValue("flow", Facade);
-                engine.Execute(JavaScript);
+                try
+                {
+                    engine.SetValue("flow", Facade);
+                    engine.Execute(JavaScript);
+                }
+                catch (Exception ex)
+                {
+                    Facade.Result = new ExecutionError(){Message = ex.ToString()}; 
+                }
             }
 
             return base.Execute(flow);
@@ -33,34 +41,30 @@ namespace PolicyExample.Scripting.GraphLogic
             _engine = new Engine();
         }
 
-        public override async Task<NodeVisitResult> Visit(LogicNode? node)
+        protected override Task<NodeExecutionResult> ExecuteNode(LogicNode node)
         {
             if (node is JintLogicNode jintLogicNode)
             {
-                VisitHistory.Push(jintLogicNode);
-                var nodeResult = await jintLogicNode.Execute(_engine, this);
-
-                return ProcessNodeResponse(node,nodeResult);
+                return jintLogicNode.Execute(_engine, this);
             }
-
-            return await base.Visit(node);
+            return base.ExecuteNode(node);
         }
     }
     
     public class OrderedExecutionFlow:IExecutionFlow
     {
-        protected readonly Stack<LogicNode> VisitHistory = new Stack<LogicNode>();
-        public virtual async Task<NodeVisitResult> Visit(LogicNode? node)
+        private readonly Stack<LogicNode> _visitHistory = new Stack<LogicNode>();
+        public async Task<NodeVisitResult> Visit(LogicNode? node)
         {
             if (node == null)
                 return new NodeVisitResult();
 
             LogicNode? NotVisitedChild()
             {
-                return node.Children.FirstOrDefault(c => !VisitHistory.Contains(c));
+                return node.Children.FirstOrDefault(c => !_visitHistory.Contains(c));
             }
 
-            if (VisitHistory.Contains(node))
+            if (_visitHistory.Contains(node))
             {
                 var notVisitedChild = NotVisitedChild();
                 
@@ -70,10 +74,16 @@ namespace PolicyExample.Scripting.GraphLogic
                 return await Visit(node.Parent);
             }
             
-            VisitHistory.Push(node);
-            var executionResult = await node.Execute(this);
+            _visitHistory.Push(node);
+            
+            var executionResult = await ExecuteNode(node);
             
             return ProcessNodeResponse(node, executionResult);
+        }
+
+        protected virtual async Task<NodeExecutionResult> ExecuteNode(LogicNode node)
+        {
+            return await node.Execute(this);
         }
 
         protected NodeVisitResult ProcessNodeResponse(LogicNode node, NodeExecutionResult executionResult)
@@ -82,7 +92,7 @@ namespace PolicyExample.Scripting.GraphLogic
             {
                 case ExecutionSuccessAndContinue cont:
                 {
-                    var notVisitedChild = node.Children.FirstOrDefault(c => !VisitHistory.Contains(c));
+                    var notVisitedChild = node.Children.FirstOrDefault(c => !_visitHistory.Contains(c));
 
                     if (notVisitedChild != null)
                         return new NodeVisitResult() {NextNode = notVisitedChild, Node = node, Result = cont};
@@ -98,9 +108,18 @@ namespace PolicyExample.Scripting.GraphLogic
                 {
                     return new NodeVisitResult() {Node = node, Result = stop};
                 }
+                case ExecutionError error:
+                {
+                    return new NodeVisitResult() {Node = node, Result = error};
+                }
             }
 
-            throw new NotImplementedException();
+            throw new UnsupportedNodeExecutionResultException();
         }
+    }
+
+    public class UnsupportedNodeExecutionResultException : Exception
+    {
+        
     }
 }
