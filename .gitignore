@@ -6,3 +6,6 @@ obj
 .DS_Store
 
 *.user
+
+node_modules
+yarn.lock

@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "generate": "graphql-codegen"
+  },
+  "devDependencies": {
+    "@graphql-codegen/c-sharp": "^1.17.9",
+    "graphql-codegen": "^0.4.0"
+  }
+}

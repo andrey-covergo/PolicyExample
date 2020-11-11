@@ -1,0 +1,5 @@
+schema: policyexample.graphql
+generates:
+  ./src/types.ts:
+    plugins:
+      - typescript

@@ -1,0 +1,174 @@
+"""
+A node in a logic tree. If ParentID is empty, than it consider as root.
+"""
+type LogicNode{
+	Id: ID!
+	Name: String!
+	Script: Script
+	ParentId: LogicNode
+	Children: [LogicNode!]
+}
+
+type LogicGraph{
+	Id: ID
+	ProvidedContexts: [ScriptContext!]
+	Name: String
+	Version: Int
+	ProvidedEngines: [ScriptEngine!]
+	Nodes: [LogicNode!]
+	Root: LogicNode!
+	RunHistory: [RunReport!]
+}
+
+type ScriptContext{
+	Id: ID
+	Name: String
+	Version: Int
+}
+
+"""
+Defines scripting language and execution runtime. Now supporting only Jint for JavaScript (ECMA 5.1)
+"""
+type ScriptEngine{
+	Id: ID
+	Name: String
+	Version: Int
+	SupportedScriptLanguages: [Language!]!
+}
+
+"""
+Describes a context available for a script during its execution. Context Schema representation depends on the Engine as well. Schema must be comprehensive for concrete Script language. For Jint engine context schema is a JSON schema
+"""
+type ScriptContextSchema{
+	Id: ID
+	ScriptContext: ScriptContext
+	Schema: String
+	Engine: ScriptEngine
+}
+
+type Script{
+	Id: ID
+	RequiredContexts: [ScriptContext!]
+	Body: String
+	Language: String
+}
+
+type RunReport{
+	Id: ID
+	ScriptEngine: ScriptEngine
+	Trace: [NodeExecutionResult!]
+	Time: DateTimeOffset
+}
+
+interface NodeExecutionResult{
+	NodeID: ID!
+	Time: DateTimeOffset!
+	Output: String
+}
+
+type NodeExecutionSuccess implements NodeExecutionResult{
+	NodeID: ID!
+	Content: String
+	Time: DateTimeOffset!
+	Output: String
+}
+
+type NodeExecutionError implements NodeExecutionResult{
+	NodeID: ID!
+	Error: String
+	Time: DateTimeOffset!
+	Output: String
+}
+
+interface CommandExecutionResult{
+	Errors: [String!]
+	Success: Boolean!
+}
+
+type CreateLogicGraphResult implements CommandExecutionResult{
+	Errors: [String!]
+	Success: Boolean!
+	LogicGraphId: ID
+}
+
+type CreateLogicNodeResult implements CommandExecutionResult{
+	Errors: [String!]
+	Success: Boolean!
+	LogicNodeId: ID
+}
+
+type RunLogicGraphResult implements CommandExecutionResult{
+	Errors: [String!]
+	Success: Boolean!
+	RunReport: RunReport
+}
+
+"""
+Represents Date with Time and Time Zone information. 
+
+Example: 2018-05-17T13:11:06.368408+01:00
+
+ISO8601 compliant
+"""
+scalar DateTimeOffset
+
+input RunLogicGraphParams{
+	Id: ID
+	LogicGraphId: ID
+	ConfigurationScript: CreateScriptParams
+	RequiredContexts: [ID!]
+}
+
+input CreateScriptParams{
+	RequiredContextsIds: [ID!]
+	Body: String!
+	Language: String!
+}
+
+input CreateLogicGraphParams{
+	Id: ID!
+	Name: String!
+	Nodes: [CreateLogicNodeParams!]
+	ProvidedContexts: [ID!]
+	ProvidedEngines: [ID!]
+}
+
+input CreateLogicNodeParams{
+	NodeId: ID
+	LogicGraphId: ID
+	Name: String!
+	Script: CreateScriptParams
+	ParentNodeId: ID
+}
+
+enum Language{
+	JavaScript
+}
+
+type PolicyExampleQueries{
+	GetSupportedContexts: [ScriptContext!]
+	GetContextSchemas(
+		contextIds: [ID!]
+	): [ScriptContextSchema!]
+}
+
+type PolicyExampleCommands{
+	CreateLogicGraphCommand(
+		commandId: Int!
+		graph: CreateLogicGraphParams
+	): CreateLogicGraphResult
+	CreateLogicNodeCommand(
+		commandId: Int!
+		graph: CreateLogicNodeParams
+	): CreateLogicNodeResult
+	RunLogicGraphCommand(
+		commandId: Int!
+		graphId: ID!
+		configuration: CreateScriptParams
+		startNodeId: ID
+	): RunLogicGraphResult
+}
+schema{
+	query: PolicyExampleQueries,
+	mutation: PolicyExampleCommands
+}
