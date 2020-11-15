@@ -25,6 +25,10 @@ namespace PolicyExample.API.GraphQL
             RegisterType<CreateLogicNodeCommandGraphType>();
             RegisterType<CreateScriptParamsGraphType>();
             RegisterType<CreateLogicNodeResultGraphType>();
+            RegisterType<RunLogicGraphCommandGraphType>();
+            RegisterType<RunLogicGraphResultGraphType>();
+            RegisterType<RunReportGraphType>();
+            RegisterType<NodeVisitResultGraphType>();
         }
     }
 }

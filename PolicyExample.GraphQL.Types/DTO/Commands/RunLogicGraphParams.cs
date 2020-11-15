@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace PolicyExample.GraphQL.Types.DTO.Commands
 {
-    public class RunLogicGraphParams {
+    public class RunLogicGraphCommand {
      
         public string Id { get; set; }
     

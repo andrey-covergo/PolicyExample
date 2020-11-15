@@ -4,9 +4,13 @@ using System.Linq;
 using GraphQL;
 using GraphQL.Types;
 using Microsoft.AspNetCore.Components.Forms;
+using PolicyExample.GraphQL.Types.DTO;
 using PolicyExample.GraphQL.Types.DTO.Commands;
 using PolicyExample.GraphQL.Types.GraphQLTypes;
 using PolicyExample.Scripting.GraphLogic;
+using ExecutionError = PolicyExample.Scripting.ExecutionError;
+using LogicGraph = PolicyExample.Scripting.GraphLogic.LogicGraph;
+using NodeExecutionResult = PolicyExample.GraphQL.Types.DTO.NodeExecutionResult;
 
 namespace PolicyExample.API.GraphQL
 {
@@ -53,6 +57,27 @@ namespace PolicyExample.API.GraphQL
                     return new CreateLogicGraphResult() { Success = true, LogicGraphId = logicGraphDomainObject.Id};
                 });
             
+            Field<RunLogicGraphResultGraphType>()
+                .Name("runLogicGraph")
+                .Argument<RunLogicGraphCommandGraphType>("command")
+                .ResolveAsync(async ctx =>
+                {
+                    var command = ctx.GetArgument<RunLogicGraphCommand>("command");
+                    var graph = persistence.Graphs.First(g => g.Id == command.LogicGraphId);
+
+
+                    var results = new List<NodeExecutionResult>();
+                    await foreach (var nodeVisit in graph.Graph.Run())
+                    {
+                        results.Add(ToNodeExecutionResult(nodeVisit));
+                    }
+
+                    return new RunLogicGraphResult() { Success = true, RunReport = new RunReport()
+                    {
+                        Id = command.Id,
+                        Trace = results
+                    }};
+                });
             
             Field<CommandExecutionResultGraphType>()
                 .Name("createNewLogicNode")
@@ -103,5 +128,27 @@ namespace PolicyExample.API.GraphQL
                 });
         }
 
+        private static NodeExecutionResult ToNodeExecutionResult(NodeVisitResult nodeVisit)
+        {
+            switch (nodeVisit.Result)
+            {
+                case null:
+                    return null;
+                case ExecutionError executionError:
+                {
+                   return new NodeExecutionError()
+                    {
+                        Error = executionError.Message, NodeID = nodeVisit.Node.Id
+                    };
+                }
+                case ExecutionSuccess executionSuccess:
+                case ExecutionSuccessAndContinue executionSuccessAndContinue:
+                case ExecutionSuccessAndRedirect executionSuccessAndRedirect:
+                case ExecutionSuccessAndStop executionSuccessAndStop:
+                    return new NodeExecutionSuccess() {Content = nodeVisit.Result.Message, NodeID = nodeVisit.Node.Id};
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
     }
 }
