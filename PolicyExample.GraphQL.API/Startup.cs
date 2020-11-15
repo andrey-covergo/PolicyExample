@@ -14,8 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using PolicyExample.GraphQL.API.GraphQLTypes;
-using PolicyExampleQueries = PolicyExample.GraphQL.API.GraphQLTypes.PolicyExampleQueries;
+using PolicyExample.GraphQL.Schema;
 
 namespace PolicyExample.GraphQL.API
 {
@@ -33,7 +32,7 @@ namespace PolicyExample.GraphQL.API
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            
+            services.AddRouting();
             services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
             services.AddSingleton<IDocumentWriter, DocumentWriter>();
             services.AddSingleton<PolicyExampleSchema>();
