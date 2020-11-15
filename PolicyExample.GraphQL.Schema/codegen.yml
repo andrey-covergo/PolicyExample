@@ -3,7 +3,7 @@ schema: "cover-go-policyexample.graphql"
 documents: "cover-go-policyexample-operations.graphql"
 
 generates:
-  src/GraphqlTypes.cs:
+  generated/GraphqlTypes.cs:
     plugins:
       - "c-sharp"
     config:

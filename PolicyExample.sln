@@ -16,11 +16,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolicyExample.API.Controlle
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolicyExample.Scripting", "PolicyExample.Scripting\PolicyExample.Scripting.csproj", "{82C00E8A-A432-4C35-8A55-8DCE682DC96A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolicyExample.GraphQL", "PolicyExample.GraphQL\PolicyExample.GraphQL.csproj", "{F4E3E731-8900-4745-B0D5-586B45EF47F1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolicyExample.GraphQL.API", "PolicyExample.GraphQL.API\PolicyExample.GraphQL.API.csproj", "{F4E3E731-8900-4745-B0D5-586B45EF47F1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolicyExample.GraphQL.Client", "PolicyExample.GraphQL.Client\PolicyExample.GraphQL.Client.csproj", "{725AC129-7329-49A2-A1B4-A01CAED39E67}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolicyExample.GraphQL.Schema", "PolicyExample.GraphQL.Schema\PolicyExample.GraphQL.Schema.csproj", "{5FFC52CB-DFF9-4E32-98D4-2DC7A2992CDC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolicyExample.Tests.Integration", "PolicyExample.Tests.Integration\PolicyExample.Tests.Integration.csproj", "{40712848-928A-4A8B-8313-30FEE1239642}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -72,5 +74,9 @@ Global
 		{5FFC52CB-DFF9-4E32-98D4-2DC7A2992CDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5FFC52CB-DFF9-4E32-98D4-2DC7A2992CDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5FFC52CB-DFF9-4E32-98D4-2DC7A2992CDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40712848-928A-4A8B-8313-30FEE1239642}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40712848-928A-4A8B-8313-30FEE1239642}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40712848-928A-4A8B-8313-30FEE1239642}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40712848-928A-4A8B-8313-30FEE1239642}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
