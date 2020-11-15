@@ -4,9 +4,9 @@ using Newtonsoft.Json;
 
 namespace PolicyExample.GraphQL.Types.DTO.Commands
 {
-    public class CreateLogicNodeParams {
+    public class CreateLogicNodeCommand {
      
-        public string NodeId { get; set; }
+        public string Id { get; set; }
     
         public string LogicGraphId { get; set; }
     
@@ -15,7 +15,7 @@ namespace PolicyExample.GraphQL.Types.DTO.Commands
     
         public CreateScriptParams Script { get; set; }
     
-        public string ParentNodeId { get; set; }
+        public string? ParentNodeId { get; set; }
         
     
      

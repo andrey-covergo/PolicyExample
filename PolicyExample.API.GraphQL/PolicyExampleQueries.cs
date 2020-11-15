@@ -1,13 +1,19 @@
 using System.Collections.Generic;
+using System.Linq;
 using GraphQL.Types;
 using PolicyExample.GraphQL.Types.DTO;
 using PolicyExample.GraphQL.Types.GraphQLTypes;
+using PolicyExample.Scripting.GraphLogic;
+using LogicGraph = PolicyExample.GraphQL.Types.DTO.LogicGraph;
+using LogicNode = PolicyExample.GraphQL.Types.DTO.LogicNode;
 
 namespace PolicyExample.API.GraphQL
 {
+    
+   
     public sealed class PolicyExampleQueries : ObjectGraphType
     {
-        public PolicyExampleQueries()
+        public PolicyExampleQueries(Persistence persistence)
         {
             var jintScriptEngine = new ScriptEngine()
             {
@@ -40,7 +46,7 @@ namespace PolicyExample.API.GraphQL
                 Id ="1",
                 Name="graph template",
                 AvailableServices = new List<ScriptService>(){logicGraphFlowService},
-                ProvidedEngines = new List<ScriptEngine>(){jintScriptEngine}
+                AvailableEngines = new List<ScriptEngine>(){jintScriptEngine}
             };
             
             var goToSecondChildScript = new Script()
@@ -104,12 +110,39 @@ namespace PolicyExample.API.GraphQL
                 .Name("logicGraph")
                 .Resolve(r =>
                 {
-                   
-                    return new[]
+                    return persistence.Graphs.Select(p => new LogicGraph()
                     {
-                        templateGraph
-                    };
+                        Id = p.Id,
+                        Name = p.Name,
+                        AvailableServices = new List<ScriptService>() {logicGraphFlowService},
+                        AvailableEngines = new List<ScriptEngine>() {jintScriptEngine}
+                    }).ToArray();
                 });
         }
     }
+
+    public static class LogicNodeExtensinos
+    {
+        // public static LogicGraph ToDto(this PolicyExample.Scripting.GraphLogic.LogicGraph p)
+        // {
+        //     return new LogicGraph()
+        //     {
+        //         Id = p.Id,
+        //         Name = p.Name,
+        //         AvailableServices = new List<ScriptService>(){logicGraphFlowService},
+        //         Nodes = NodeExtensions.GetAllChildrenNodes(p.Graph.Root)
+        //             .Select(node => node.ToDto())
+        //                                             
+        //     }
+        // }
+        //
+        // public static LogicNode ToDto(this PolicyExample.Scripting.GraphLogic.LogicNode node)
+        // {
+        //     var node = new LogicNode()
+        //     {
+        //         
+        //     }
+        // }
+    }
+    
 }

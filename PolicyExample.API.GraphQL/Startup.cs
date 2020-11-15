@@ -39,6 +39,7 @@ namespace PolicyExample.API.GraphQL
             services.AddSingleton<PolicyExampleSchema>();
             services.AddSingleton<PolicyExampleQueries>();
             services.AddSingleton<PolicyExampleMutations>();
+            services.AddSingleton<Persistence>();
             
             
             services.AddGraphQL((options, provider) =>

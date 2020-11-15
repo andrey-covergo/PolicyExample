@@ -13,4 +13,14 @@ namespace PolicyExample.GraphQL.Types.GraphQLTypes
             Interface<CommandExecutionResultGraphType>();
         }
     }
+    public sealed class CreateLogicNodeResultGraphType :  ObjectGraphType<CreateLogicNodeResult>
+    {
+        public CreateLogicNodeResultGraphType()
+        {
+            Field(d => d.Success);
+            Field(d => d.Errors, type:typeof(ListGraphType<StringGraphType>));
+            Field(d => d.LogicNodeId, nullable:true);
+            Interface<CommandExecutionResultGraphType>();
+        }
+    }
 }
