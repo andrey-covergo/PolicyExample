@@ -20,7 +20,7 @@ namespace PolicyExample.Scripting.GraphLogic
             {
                 try
                 {
-                    engine.SetValue("flow", Facade);
+                    engine.SetValue("flow", Facade.Facade);
                     engine.Execute(JavaScript);
                 }
                 catch (Exception ex)

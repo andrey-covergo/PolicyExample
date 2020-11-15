@@ -8,7 +8,7 @@ namespace PolicyExample.GraphQL.DTO
         public List<ScriptService> GetSupportedContexts { get; set; }
     
         
-        public List<ScriptContextSchema> GetContextSchemas { get; set; }
+        public List<ScriptServiceSchema> GetContextSchemas { get; set; }
         
     }
 }

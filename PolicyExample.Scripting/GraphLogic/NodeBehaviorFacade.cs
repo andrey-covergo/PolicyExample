@@ -1,9 +1,17 @@
 namespace PolicyExample.Scripting.GraphLogic
 {
+    public interface INodeFlowService
+    {
+        void Stop();
+        void RedirectToParent();
+        bool RedirectToChild(int index);
+    }
+   
+
     /// <summary>
     /// Exposed to a script, should not have any public members more than available to a script
     /// </summary>
-    public class NodeBehaviorFacade
+    public class NodeFlowService : INodeFlowService
     {
         
         /// <summary>
@@ -11,8 +19,8 @@ namespace PolicyExample.Scripting.GraphLogic
         /// </summary>
         internal NodeExecutionResult? Result { get; set; }
         private readonly LogicNode _node;
-    
-        public NodeBehaviorFacade(LogicNode node)
+        public INodeFlowService Facade => this;
+        public NodeFlowService(LogicNode node)
         {
             _node = node;
         }
@@ -23,7 +31,7 @@ namespace PolicyExample.Scripting.GraphLogic
 
         public void RedirectToParent()
         {
-            Result = new ExecutionSuccessAndRedirect(_node.Parent);;
+            Result = new ExecutionSuccessAndRedirect(_node.Parent);
         }
         
         public bool RedirectToChild(int index)

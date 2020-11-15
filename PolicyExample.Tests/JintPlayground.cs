@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Jint;
+using Jint.Native;
 using Jint.Runtime;
 using Xunit;
 using Xunit.Abstractions;
@@ -49,7 +50,12 @@ namespace PolicyExample.Tests
                   var result = calc();
                 ");
             var value = engine.GetValue("result");
+            
+           
             value.ToObject().As<double>().Should().Be(calculator.Add(1,2));
+
+            var a = JsValue.FromObject(engine, calculator);
+            _output.WriteLine(a.ToString());
         }  
         
         [Fact]

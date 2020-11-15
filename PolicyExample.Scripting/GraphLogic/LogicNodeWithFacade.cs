@@ -4,10 +4,10 @@ namespace PolicyExample.Scripting.GraphLogic
 {
     public class LogicNodeWithFacade : LogicNode
     {
-        protected readonly NodeBehaviorFacade Facade;
+        protected readonly NodeFlowService Facade;
         public LogicNodeWithFacade()
         {   
-            Facade = new NodeBehaviorFacade(this);
+            Facade = new NodeFlowService(this);
         }
         public override Task<NodeExecutionResult> Execute(IExecutionFlow flow)
         {

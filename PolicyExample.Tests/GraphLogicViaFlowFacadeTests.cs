@@ -124,7 +124,7 @@ namespace PolicyExample.Tests
 
         class TestFacadeNode : LogicNodeWithFacade
         {
-            public Action<NodeBehaviorFacade>? Behavior { get; set; }
+            public Action<NodeFlowService>? Behavior { get; set; }
 
             public override Task<NodeExecutionResult> Execute(IExecutionFlow flow)
             {
