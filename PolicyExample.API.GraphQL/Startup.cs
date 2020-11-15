@@ -37,6 +37,9 @@ namespace PolicyExample.API.GraphQL
             services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
             services.AddSingleton<IDocumentWriter, DocumentWriter>();
             services.AddSingleton<PolicyExampleSchema>();
+            services.AddSingleton<PolicyExampleQueries>();
+            services.AddSingleton<PolicyExampleMutations>();
+            
             
             services.AddGraphQL((options, provider) =>
             {

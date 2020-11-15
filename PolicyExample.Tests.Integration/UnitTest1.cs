@@ -3,14 +3,12 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using GraphQL;
 using GraphQL.Client.Http;
+using GraphQL.Client.Serializer.Newtonsoft;
 using GraphQL.Client.Serializer.SystemTextJson;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.TestHost;
 using PolicyExample.API.GraphQL;
 using PolicyExample.GraphQL.Types.DTO.Commands;
-using PolicyExample.GraphQL.Types.GraphQLTypes;
 using Xunit;
 
 namespace PolicyExample.Tests.Integration
@@ -23,11 +21,10 @@ namespace PolicyExample.Tests.Integration
             var webHostBuilder = new WebHostBuilder().UseStartup<Startup>();
             using var server = new TestServer(webHostBuilder);
             var testHttpClient = server.CreateClient();
-            
-            var options = new GraphQLHttpClientOptions();
-            options.EndPoint = new Uri("https://localhost:5001/graphql");
+
+            var options = new GraphQLHttpClientOptions {EndPoint = new Uri("https://localhost:5001/graphql")};
             var client = new GraphQLHttpClient(options, 
-                                new SystemTextJsonSerializer(),
+                                new NewtonsoftJsonSerializer(),
                                 testHttpClient);
             
                 
@@ -41,16 +38,24 @@ mutation CreateNewGraph {
 }){
     success
     errors
+    ... on CreateLogicGraphResult{
+          logicGraphId
+    }
   }
 }"
                 };
 
-            var res = await client.SendMutationAsync<CreateLogicGraphResult>(logicGraphCreationRequest);
+            var res = await client.SendMutationAsync<RootObject<CreateLogicGraphResult>>(logicGraphCreationRequest);
 
-            res.Errors.Should().BeEmpty();
-            res.Data.Success.Should().BeTrue();
-            res.Data.Errors.Should().BeEmpty();
-            res.Data.LogicGraphId.Should().NotBeEmpty();
+            res.Errors.Should().BeNullOrEmpty();
+            res.Data.createNewLogicGraph.Success.Should().BeTrue();
+            res.Data.createNewLogicGraph.Errors.Should().BeNullOrEmpty();
+            res.Data.createNewLogicGraph.LogicGraphId.Should().NotBeEmpty();
         }
+    }
+
+    class RootObject<T>
+    {
+        public T createNewLogicGraph { get; set; }
     }
 }

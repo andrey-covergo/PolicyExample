@@ -3,7 +3,7 @@ using PolicyExample.GraphQL.Types.DTO.Commands;
 
 namespace PolicyExample.GraphQL.Types.GraphQLTypes
 {
-    public class CreateLogicGraphResultGraphType :  ObjectGraphType<CreateLogicGraphResult>
+    public sealed class CreateLogicGraphResultGraphType :  ObjectGraphType<CreateLogicGraphResult>
     {
         public CreateLogicGraphResultGraphType()
         {
