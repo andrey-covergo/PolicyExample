@@ -9,7 +9,7 @@ namespace PolicyExample.GraphQL.Types.GraphQLTypes
         {
             Field(c => c.Errors);
             Field(c => c.Success);
-            Field(c => c.RunReport);
+            Field(c => c.RunReport, type:typeof(RunReportGraphType));
             Interface<CommandExecutionResultGraphType>();
         }
     }

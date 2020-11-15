@@ -63,20 +63,39 @@ namespace PolicyExample.API.GraphQL
                 .ResolveAsync(async ctx =>
                 {
                     var command = ctx.GetArgument<RunLogicGraphCommand>("command");
-                    var graph = persistence.Graphs.First(g => g.Id == command.LogicGraphId);
 
-
-                    var results = new List<NodeExecutionResult>();
-                    await foreach (var nodeVisit in graph.Graph.Run())
+                    try
                     {
-                        results.Add(ToNodeExecutionResult(nodeVisit));
+                        var graph = persistence.Graphs.First(g => g.Id == command.LogicGraphId);
+
+
+                        var results = new List<NodeExecutionResult>();
+                        await foreach (var nodeVisit in graph.Graph.Run())
+                        {
+                            results.Add(ToNodeExecutionResult(nodeVisit));
+                        }
+
+                        return new RunLogicGraphResult()
+                        {
+                            Success = true, RunReport = new RunReport()
+                            {
+                                Id = command.Id,
+                                Trace = results
+                            }
+                        };
                     }
-
-                    return new RunLogicGraphResult() { Success = true, RunReport = new RunReport()
+                    catch (Exception ex)
                     {
-                        Id = command.Id,
-                        Trace = results
-                    }};
+                        return new RunLogicGraphResult()
+                        {
+                            Errors = new List<string>()
+                            {
+                                "Cannot run graph " + command.LogicGraphId,
+                                ex.ToString()
+                            },
+                            Success = false
+                        };
+                    }
                 });
             
             Field<CommandExecutionResultGraphType>()
@@ -136,16 +155,31 @@ namespace PolicyExample.API.GraphQL
                     return null;
                 case ExecutionError executionError:
                 {
-                   return new NodeExecutionError()
+                    return new NodeExecutionResult()
                     {
-                        Error = executionError.Message, NodeID = nodeVisit.Node.Id
+                        Errors = new List<string>() {executionError.Message}, 
+                        Node =
+                            new PolicyExample.GraphQL.Types.DTO.LogicNode()
+                            {
+                                Id=nodeVisit.Node.Id,
+                                Name = nodeVisit.Node.Name
+                            },
                     };
                 }
                 case ExecutionSuccess executionSuccess:
                 case ExecutionSuccessAndContinue executionSuccessAndContinue:
                 case ExecutionSuccessAndRedirect executionSuccessAndRedirect:
                 case ExecutionSuccessAndStop executionSuccessAndStop:
-                    return new NodeExecutionSuccess() {Content = nodeVisit.Result.Message, NodeID = nodeVisit.Node.Id};
+                    return new NodeExecutionResult()
+                    {
+                        Errors = new List<string>() {nodeVisit.Result.Message}, 
+                        Node =
+                            new PolicyExample.GraphQL.Types.DTO.LogicNode()
+                            {
+                                Id=nodeVisit.Node.Id,
+                                Name = nodeVisit.Node.Name
+                            },
+                    };
                 default:
                     throw new ArgumentOutOfRangeException();
             }

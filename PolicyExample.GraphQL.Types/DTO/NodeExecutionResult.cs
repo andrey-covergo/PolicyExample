@@ -1,14 +1,14 @@
 using System;
+using System.Collections.Generic;
 
 namespace PolicyExample.GraphQL.Types.DTO
 {
-    public interface NodeExecutionResult {
+    public class NodeExecutionResult {
         
-        public string NodeID { get; set; }
+        public LogicNode Node { get; set; }
+        public List<string> Errors { get; set; }
     
-        
         public DateTimeOffset Time { get; set; }
-    
         
         public string Output { get; set; }
     }

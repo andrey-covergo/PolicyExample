@@ -19,10 +19,14 @@ namespace PolicyExample.GraphQL.Types.GraphQLTypes
     {
         public NodeVisitResultGraphType()
         {
-            Field(f => f.NodeID);
+            Field(f => f.Node,type:typeof(LogicNodeGraphType));
             Field(f => f.Output);
+            Field(f => f.Errors,type:typeof(ListGraphType<StringGraphType>));
         }
     }
+
+     
+
     
     public sealed class  RunReportGraphType : ObjectGraphType<RunReport> {
         public RunReportGraphType()

@@ -92,6 +92,76 @@ mutation CreateNewNode {
             nodeResult.Data.createNewLogicNode.LogicNodeId.Should().NotBeNullOrEmpty();
         }
 
+        
+        [Fact]
+        public async Task Given_graph_When_running_it_Then_receive_trace()
+        {
+            var client = SetupClient();
+
+            var logicGraphCreationRequest = new GraphQLRequest {
+                Query = @"
+mutation CreateNewNode {
+  createNewLogicGraph(command: {
+    id: ""abc""
+    name: ""new graph""
+    providedEngines: [""a"",""b"",""c""]
+}){
+    success
+    errors
+    ... on CreateLogicGraphResult{
+          logicGraphId
+    }
+  }
+}"
+            };
+
+            var res = await client.SendMutationAsync<CreateNewGraphRootObject>(logicGraphCreationRequest);
+            var graphId = res.Data.createNewLogicGraph.LogicGraphId;
+
+            var logicNodeCreationRequest = new GraphQLRequest
+            {
+                Query = @"
+mutation CreateNewNode {
+  createNewLogicNode(command: {
+    id: ""2""
+    name: ""root node""
+    logicGraphId:""" + graphId + @"""
+            }){
+                errors
+                success
+                    ... on CreateLogicNodeResult{
+                    logicNodeId
+                }
+            }
+        }"
+            };
+
+            var nodeResult = await client.SendMutationAsync<CreateNewNodeRootObject>(logicNodeCreationRequest);
+            
+            var runLogicGraphRequest = new GraphQLRequest
+            {
+                Query = @"
+mutation RunLogicGraph {
+  runLogicGraph(command: {
+    id: ""3""
+    logicGraphId:""" + graphId + @"""
+            }){
+                success
+                runReport
+                {
+                  trace{
+                    nodeID
+                  }
+                }
+            }
+        }"
+            };
+            var traceA = await client.SendMutationAsync<object>(runLogicGraphRequest);
+            var trace = await client.SendMutationAsync<RunLogicGraphRootObject>(runLogicGraphRequest);
+
+            trace.Data.runLogicGraph.RunReport.Trace.Should().NotBeNullOrEmpty();
+        }
+        
         private static GraphQLHttpClient SetupClient()
         {
             var webHostBuilder = new WebHostBuilder().UseStartup<Startup>();
@@ -114,6 +184,11 @@ mutation CreateNewNode {
     class CreateNewNodeRootObject
     {
         public CreateLogicNodeResult createNewLogicNode { get; set; }
+    }
+    
+    class RunLogicGraphRootObject
+    {
+        public RunLogicGraphResult runLogicGraph { get; set; }
     }
 
 }
