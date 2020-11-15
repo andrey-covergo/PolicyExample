@@ -1,15 +1,14 @@
 namespace PolicyExample.GraphQL.DTO
 {
-    public class ScriptContext {
+    public class ScriptService {
      
-        
         public string Id { get; set; }
     
         
         public string Name { get; set; }
     
         
-        public int? Version { get; set; }
+        public string Version { get; set; }
         
     }
 }

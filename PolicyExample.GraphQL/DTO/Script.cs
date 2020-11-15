@@ -8,7 +8,7 @@ namespace PolicyExample.GraphQL.DTO
         public string Id { get; set; }
     
         
-        public List<ScriptContext> RequiredContexts { get; set; }
+        public List<ScriptService> RequiredContexts { get; set; }
     
         
         public string Body { get; set; }

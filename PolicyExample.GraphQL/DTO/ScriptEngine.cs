@@ -14,7 +14,7 @@ namespace PolicyExample.GraphQL.DTO
         public string Name { get; set; }
     
         
-        public int? Version { get; set; }
+        public string Version { get; set; }
     
         
         public List<Language> SupportedScriptLanguages { get; set; }

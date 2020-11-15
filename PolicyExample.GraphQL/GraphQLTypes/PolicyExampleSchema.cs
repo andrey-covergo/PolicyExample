@@ -9,7 +9,10 @@ namespace PolicyExample.GraphQL.GraphQLTypes
         public PolicyExampleSchema(IServiceProvider resolver)
             : base(resolver)
         {
-            Query = resolver.GetService<PolicyExampleQuery>();
+            Query = resolver.GetService<PolicyExampleQueries>();
+            RegisterType<LanguageGraphType>();
+            RegisterType<ScriptEngineGraphType>();
+            RegisterType<ScriptServiceGraphType>();
         }
     }
 }

@@ -9,7 +9,7 @@ namespace PolicyExample.GraphQL.DTO
         public string Id { get; set; }
     
         
-        public ScriptContext ScriptContext { get; set; }
+        public ScriptService ScriptService { get; set; }
     
         
         public string Schema { get; set; }

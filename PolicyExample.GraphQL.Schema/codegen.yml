@@ -3,9 +3,11 @@ schema: "cover-go-policyexample.graphql"
 documents: "cover-go-policyexample-operations.graphql"
 
 generates:
-  src/generated/GraphqlTypes.cs:
+  src/GraphqlTypes.cs:
     plugins:
       - "c-sharp"
     config:
+      className: PolicyExampleGraphQLTypes
+      namespaceName: PolicyExample.GraphQL.Types
       scalars:
         DateTimeOffset: DateTimeOffset
