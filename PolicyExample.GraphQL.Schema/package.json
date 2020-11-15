@@ -1,0 +1,16 @@
+{
+  "scripts": {
+    "generate": "graphql-codegen"
+  },
+  "dependencies": {
+    "graphql": "^15.4.0"
+  },
+  "devDependencies": {
+    "@graphql-codegen/c-sharp": "^1.17.9",
+    "@graphql-codegen/c-sharp-operations": "^1.17.9",
+    "@graphql-codegen/cli": "^1.19.1"
+  },
+  "resolutions": {
+    "graphql": "15.4.0"
+  }
+}

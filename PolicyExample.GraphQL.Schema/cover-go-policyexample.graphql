@@ -168,6 +168,7 @@ type PolicyExampleCommands{
 		startNodeId: ID
 	): RunLogicGraphResult
 }
+
 schema{
 	query: PolicyExampleQueries,
 	mutation: PolicyExampleCommands

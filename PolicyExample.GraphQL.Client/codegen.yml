@@ -1,0 +1,17 @@
+overwrite: true
+schema: "cover-go-policyexample.graphql"
+documents: "cover-go-policyexample-operations.graphql"
+
+generates:
+  src/generated/GraphqlTypes.cs:
+    plugins:
+      - "c-sharp"
+    config:
+      scalars:
+        DateTimeOffset: DateTimeOffset
+  src/generated/GraphQLOperations.cs:
+    plugins:
+      - "c-sharp-operations"
+    config:
+      scalars:
+        DateTimeOffset: DateTimeOffset

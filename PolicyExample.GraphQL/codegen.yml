@@ -1,7 +1,0 @@
-schema: policyexample.graphql
-generates:
-  ./GraphQLTypes.cs:
-    plugins:
-      - c-sharp
-    config:
-      className: PolicyExampleGraphQLTypes
