@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.TestHost;
-using PolicyExample.GraphQL.API;
-using PolicyExample.GraphQL.Schema.DTO.Commands;
-using PolicyExample.GraphQL.Schema.GraphQLTypes;
+using PolicyExample.API.GraphQL;
+using PolicyExample.GraphQL.Types.DTO.Commands;
+using PolicyExample.GraphQL.Types.GraphQLTypes;
 using Xunit;
 
 namespace PolicyExample.Tests.Integration
@@ -20,11 +20,6 @@ namespace PolicyExample.Tests.Integration
         [Fact]
         public async Task Given_createLogicGraph_command_When_executing_it_Then_receive_new_graph_Id()
         {
-            //
-            // Host.CreateDefaultBuilder(args)
-            //     .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
-            //
-            // Build your "app"
             var webHostBuilder = new WebHostBuilder().UseStartup<Startup>();
             using var server = new TestServer(webHostBuilder);
             var testHttpClient = server.CreateClient();
@@ -52,8 +47,10 @@ mutation CreateNewGraph {
 
             var res = await client.SendMutationAsync<CreateLogicGraphResult>(logicGraphCreationRequest);
 
+            res.Errors.Should().BeEmpty();
             res.Data.Success.Should().BeTrue();
             res.Data.Errors.Should().BeEmpty();
+            res.Data.LogicGraphId.Should().NotBeEmpty();
         }
     }
 }
