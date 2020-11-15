@@ -1,6 +1,7 @@
 using System;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
+using PolicyExample.GraphQL.DTO;
 
 namespace PolicyExample.GraphQL.GraphQLTypes
 {
@@ -10,6 +11,8 @@ namespace PolicyExample.GraphQL.GraphQLTypes
             : base(resolver)
         {
             Query = resolver.GetService<PolicyExampleQueries>();
+            Mutation = resolver.GetService<PolicyExampleMutations>();
+            
             RegisterType<LanguageGraphType>();
             RegisterType<ScriptEngineGraphType>();
             RegisterType<ScriptServiceGraphType>();
@@ -17,6 +20,9 @@ namespace PolicyExample.GraphQL.GraphQLTypes
             RegisterType<ScriptGraphType>();
             RegisterType<LogicNodeGraphType>();
             RegisterType<LogicGraphGraphType>();
+            RegisterType<CommandExecutionResultGraphType>();
+            RegisterType<CreateLogicGraphResultGraphType>();
+            RegisterType<CreateLogicGraphCommandGraphType>();
         }
     }
 }

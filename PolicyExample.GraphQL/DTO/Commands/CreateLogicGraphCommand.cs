@@ -4,12 +4,10 @@ using Newtonsoft.Json;
 
 namespace PolicyExample.GraphQL.DTO
 {
-    public class CreateLogicGraphParams {
+    public class CreateLogicGraphCommand {
      
-        [JsonRequired]
         public string Id { get; set; }
     
-        [JsonRequired]
         public string Name { get; set; }
     
         public List<CreateLogicNodeParams> Nodes { get; set; }
@@ -17,8 +15,6 @@ namespace PolicyExample.GraphQL.DTO
         public List<string> ProvidedContexts { get; set; }
     
         public List<string> ProvidedEngines { get; set; }
-        
-    
      
         public dynamic GetInputObject()
         {

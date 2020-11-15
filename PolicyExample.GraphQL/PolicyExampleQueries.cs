@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using GraphQL.Types;
-using NJsonSchema;
 using PolicyExample.GraphQL.DTO;
-using PolicyExample.Scripting.GraphLogic;
 using LogicGraph = PolicyExample.GraphQL.DTO.LogicGraph;
 using LogicNode = PolicyExample.GraphQL.DTO.LogicNode;
 
@@ -36,6 +34,14 @@ namespace PolicyExample.GraphQL.GraphQLTypes
         redirectToParent : function(){} // returns nothing
         redirectToChild: function(childNum){} // returns bool 
     }"
+            };
+            
+            var templateGraph = new LogicGraph()
+            {
+                Id ="1",
+                Name="graph template",
+                AvailableServices = new List<ScriptService>(){logicGraphFlowService},
+                ProvidedEngines = new List<ScriptEngine>(){jintScriptEngine}
             };
             
             var goToSecondChildScript = new Script()
@@ -99,15 +105,10 @@ namespace PolicyExample.GraphQL.GraphQLTypes
                 .Name("logicGraph")
                 .Resolve(r =>
                 {
+                   
                     return new[]
                     {
-                        new LogicGraph()
-                        {
-                        Id ="1",
-                        Name="graph template",
-                        AvailableServices = new List<ScriptService>(){logicGraphFlowService},
-                        ProvidedEngines = new List<ScriptEngine>(){jintScriptEngine}
-                        }
+                        templateGraph
                     };
                 });
         }
