@@ -29,7 +29,7 @@ namespace PolicyExample.GraphQL.GraphQLTypes
                 Service = logicGraphFlowService,
                 Engine = jintScriptEngine,
                 Schema = @"
-    var INodeFlowService = {
+    var flow = {
         stop : function(){} // returns nothing
         redirectToParent : function(){} // returns nothing
         redirectToChild: function(childNum){} // returns bool 
@@ -50,7 +50,7 @@ namespace PolicyExample.GraphQL.GraphQLTypes
             });
             
             Field<ListGraphType<ScriptServiceSchemaGraphType>>()
-                .Name("scriptService")
+                .Name("scriptServiceSchema")
                 .Resolve( r =>
             {
               
@@ -59,6 +59,22 @@ namespace PolicyExample.GraphQL.GraphQLTypes
                     nodeFlowServiceSchema
                 };
             });
+            
+            Field<ListGraphType<ScriptGraphType>>()
+                .Name("script")
+                .Resolve( r =>
+                {
+                    return new[]
+                    {
+                        new Script()
+                        {
+                            Body="flow.redirectToChild(1);",
+                            Id="redirectToChild1",
+                            Language = Language.JavaScript,
+                            RequiredServices = new List<ScriptService>(){logicGraphFlowService}
+                        }
+                    };
+                });
         }
     }
 }
