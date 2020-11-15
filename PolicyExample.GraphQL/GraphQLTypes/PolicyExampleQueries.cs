@@ -3,6 +3,8 @@ using GraphQL.Types;
 using NJsonSchema;
 using PolicyExample.GraphQL.DTO;
 using PolicyExample.Scripting.GraphLogic;
+using LogicGraph = PolicyExample.GraphQL.DTO.LogicGraph;
+using LogicNode = PolicyExample.GraphQL.DTO.LogicNode;
 
 namespace PolicyExample.GraphQL.GraphQLTypes
 {
@@ -36,6 +38,14 @@ namespace PolicyExample.GraphQL.GraphQLTypes
     }"
             };
             
+            var goToSecondChildScript = new Script()
+            {
+                Body="flow.redirectToChild(1);",
+                Id="redirectToChild1",
+                Language = Language.JavaScript,
+                RequiredServices = new List<ScriptService>(){logicGraphFlowService}
+            };
+            
             
             Field<ListGraphType<LanguageGraphType>>("language", resolve:r =>new[]{Language.JavaScript});
             Field<ListGraphType<ScriptServiceGraphType>>("scriptEngine", resolve: r =>
@@ -66,12 +76,37 @@ namespace PolicyExample.GraphQL.GraphQLTypes
                 {
                     return new[]
                     {
-                        new Script()
+                        goToSecondChildScript
+                    };
+                });
+
+            Field<ListGraphType<LogicNodeGraphType>>()
+                .Name("logicNode")
+                .Resolve(r =>
+                {
+                    return new[]
+                    {
+                        new LogicNode()
                         {
-                            Body="flow.redirectToChild(1);",
-                            Id="redirectToChild1",
-                            Language = Language.JavaScript,
-                            RequiredServices = new List<ScriptService>(){logicGraphFlowService}
+                           Id="1",
+                           Name="Root",
+                           Script = goToSecondChildScript 
+                        }
+                    };
+                });
+            
+            Field<ListGraphType<LogicGraphGraphType>>()
+                .Name("logicGraph")
+                .Resolve(r =>
+                {
+                    return new[]
+                    {
+                        new LogicGraph()
+                        {
+                        Id ="1",
+                        Name="graph template",
+                        AvailableServices = new List<ScriptService>(){logicGraphFlowService},
+                        ProvidedEngines = new List<ScriptEngine>(){jintScriptEngine}
                         }
                     };
                 });

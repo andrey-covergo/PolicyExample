@@ -17,7 +17,7 @@ namespace PolicyExample.GraphQL.DTO {
       public Script Script { get; set; }
     
       
-      public LogicNode ParentId { get; set; }
+      public LogicNode Parent { get; set; }
     
       
       public List<LogicNode> Children { get; set; }

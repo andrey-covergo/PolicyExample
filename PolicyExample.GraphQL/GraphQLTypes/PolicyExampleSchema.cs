@@ -15,6 +15,8 @@ namespace PolicyExample.GraphQL.GraphQLTypes
             RegisterType<ScriptServiceGraphType>();
             RegisterType<ScriptServiceSchemaGraphType>();
             RegisterType<ScriptGraphType>();
+            RegisterType<LogicNodeGraphType>();
+            RegisterType<LogicGraphGraphType>();
         }
     }
 }
