@@ -72,21 +72,21 @@ mutation CreateNewGraph($command: CreateLogicGraphCommand) {
 
             var logicGraphCreationRequest = new GraphQLRequest {
                 Query = @"
-mutation CreateNewNode {
-  createNewLogicGraph(command: {
-    id: ""abc""
-    name: ""new graph""
-    providedEngines: [""a"",""b"",""c""]
-}){
+mutation CreateNewGraph($command: CreateLogicGraphCommand) {
+  createNewLogicGraph(command: $command){
     success
     errors
     ... on CreateLogicGraphResult{
           logicGraphId
     }
   }
-}"
+}",
+                Variables = new
+                {
+                    command = new CreateLogicGraphCommand(){Id="abc",Name = "haha"}
+                }
             };
-
+            
             var res = await client.SendMutationAsync<CreateNewGraphRootObject>(logicGraphCreationRequest);
             var graphId = res.Data.createNewLogicGraph.LogicGraphId;
 

@@ -10,8 +10,6 @@ namespace PolicyExample.GraphQL.Types.DTO.Commands
     
         public string Name { get; set; }
     
-        public List<CreateLogicNodeCommand> Nodes { get; set; }
-    
         public List<string> ProvidedContexts { get; set; }
     
         public List<string> ProvidedEngines { get; set; }
