@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
 using GraphQL;
@@ -18,17 +21,79 @@ namespace PolicyExample.Tests.Integration
 
     public class PolicyExampleGraphQLClient
     {
-        public PolicyExampleGraphQLClient()
+        public readonly GraphQLHttpClient Client;
+
+        public PolicyExampleGraphQLClient(HttpClient httpClient, string? endpoint=null)
         {
-            
+            var options = new GraphQLHttpClientOptions {EndPoint = new Uri(endpoint ?? "https://localhost:5001/graphql")};
+            Client = new GraphQLHttpClient(options,
+                                            new NewtonsoftJsonSerializer(),
+                                            httpClient);
         }
-        public Task<CreateLogicGraphResult> Execute(CreateLogicGraphCommand command)
+        public async Task<CreateLogicGraphResult> Execute(CreateLogicGraphCommand command)
         {
-            throw new NotImplementedException();
+            int a;
+            var logicGraphCreationRequest = new GraphQLRequest {
+                Query = @"
+mutation CreateNewGraph($command: CreateLogicGraphCommand) {
+  createNewLogicGraph(command: $command){
+    success
+    errors
+    ... on CreateLogicGraphResult{
+          logicGraphId
+    }
+  }
+}",
+                Variables = new
+                {
+                    command
+                }
+            };
+            
+            var res = await Client.SendMutationAsync<CreateNewGraphRootObject>(logicGraphCreationRequest);
+            if (res.Errors?.Any()==true)
+            {
+                throw new GraphQLException(res.Errors);
+            }
+            if (res.Data==null)
+            {
+                throw new GraphQLException("received null Data response");
+            }
+            
+            return res.Data.createNewLogicGraph;
+        }
+        
+        class CreateNewGraphRootObject
+        {
+            public CreateLogicGraphResult createNewLogicGraph { get; set; }
+        }
+
+        class CreateNewNodeRootObject
+        {
+            public CreateLogicNodeResult createNewLogicNode { get; set; }
+        }
+    
+        class RunLogicGraphRootObject
+        {
+            public RunLogicGraphResult runLogicGraph { get; set; }
+        }
+
+    }
+
+    public class GraphQLException : Exception
+    {
+        public GraphQLError[]? Errors { get; }
+
+        public GraphQLException(GraphQLError[]? errors)
+        {
+            Errors = errors;
+        }
+        public GraphQLException(string message):base(message)
+        {
         }
     }
-    
-    
+
+
     public class LogicGraphCreationTests
     {
         [Fact]
@@ -157,27 +222,14 @@ mutation CreateNewNode {
         [Fact]
         public async Task Given_graph_When_running_it_Then_receive_trace()
         {
-            var client = SetupClient();
+            var testHttpclient = SetupTestHostAndClient();
+            var graphQlClient = new PolicyExampleGraphQLClient(testHttpclient);
+            var client = graphQlClient.Client;
 
-            var logicGraphCreationRequest = new GraphQLRequest {
-                Query = @"
-mutation CreateNewNode {
-  createNewLogicGraph(command: {
-    id: ""abc""
-    name: ""new graph""
-    providedEngines: [""a"",""b"",""c""]
-}){
-    success
-    errors
-    ... on CreateLogicGraphResult{
-          logicGraphId
-    }
-  }
-}"
-            };
-
-            var res = await client.SendMutationAsync<CreateNewGraphRootObject>(logicGraphCreationRequest);
-            var graphId = res.Data.createNewLogicGraph.LogicGraphId;
+            var createLogicGraphCommand = new CreateLogicGraphCommand(){Id="abc",Name="new graph", ProvidedContexts = new List<string>{"a","b","c"}};
+            
+            var res = await graphQlClient.Execute(createLogicGraphCommand);
+            var graphId = res.LogicGraphId;
 
             var logicNodeCreationRequest = new GraphQLRequest
             {
@@ -226,15 +278,21 @@ mutation RunLogicGraph {
         
         private static GraphQLHttpClient SetupClient()
         {
-            var webHostBuilder = new WebHostBuilder().UseStartup<Startup>();
-            var server = new TestServer(webHostBuilder);
-            var testHttpClient = server.CreateClient();
+            var testHttpClient = SetupTestHostAndClient();
 
             var options = new GraphQLHttpClientOptions {EndPoint = new Uri("https://localhost:5001/graphql")};
             var client = new GraphQLHttpClient(options,
                 new NewtonsoftJsonSerializer(),
                 testHttpClient);
             return client;
+        }
+
+        private static HttpClient SetupTestHostAndClient()
+        {
+            var webHostBuilder = new WebHostBuilder().UseStartup<Startup>();
+            var server = new TestServer(webHostBuilder);
+            var testHttpClient = server.CreateClient();
+            return testHttpClient;
         }
     }
 
