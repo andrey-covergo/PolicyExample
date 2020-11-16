@@ -57,7 +57,11 @@ namespace PolicyExample.Scripting.GraphLogic
         public async Task<NodeVisitResult> Visit(LogicNode? node)
         {
             if (node == null)
-                return new NodeVisitResult();
+            {
+                //finishing the flow_
+                _visitHistory.Clear();
+               return new NodeVisitResult();
+            }
 
             LogicNode? NotVisitedChild()
             {

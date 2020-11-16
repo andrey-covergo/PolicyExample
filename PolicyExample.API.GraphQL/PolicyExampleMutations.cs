@@ -68,19 +68,14 @@ namespace PolicyExample.API.GraphQL
                     {
                         var graph = persistence.Graphs.First(g => g.Id == command.LogicGraphId);
 
-
-                        var results = new List<NodeExecutionResult>();
-                        await foreach (var nodeVisit in graph.Graph.Run())
-                        {
-                            results.Add(ToNodeExecutionResult(nodeVisit));
-                        }
+                        var results = await graph.Graph.Run().ToListAsync();
 
                         return new RunLogicGraphResult()
                         {
                             Success = true, RunReport = new RunReport()
                             {
                                 Id = command.Id,
-                                Trace = results
+                                Trace = results.Select(ToNodeExecutionResult).ToList()
                             }
                         };
                     }
