@@ -8,6 +8,8 @@ namespace PolicyExample.GraphQL.Types.GraphQLTypes
         public CreateScriptParamsGraphType()
         {
             Field(s => s.Body);
+            Field(s => s.Language);
+            Field(s => s.RequiredContextsIds,type:typeof(ListGraphType<StringGraphType>));
         }
     }
 }

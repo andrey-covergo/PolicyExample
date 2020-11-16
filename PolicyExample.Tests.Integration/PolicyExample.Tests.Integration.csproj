@@ -23,6 +23,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\PolicyExample.API.GraphQL\PolicyExample.API.GraphQL.csproj" />
+      <ProjectReference Include="..\PolicyExample.GraphQL.Client\PolicyExample.GraphQL.Client.csproj" />
       <ProjectReference Include="..\PolicyExample.GraphQL.Types\PolicyExample.GraphQL.Types.csproj" />
     </ItemGroup>
 

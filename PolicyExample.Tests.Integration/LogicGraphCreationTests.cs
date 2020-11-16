@@ -7,32 +7,38 @@ using FluentAssertions;
 using GraphQL;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.Newtonsoft;
-using GraphQL.Client.Serializer.SystemTextJson;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Newtonsoft.Json;
 using PolicyExample.API.GraphQL;
+using PolicyExample.GraphQL.Client;
 using PolicyExample.GraphQL.Types.DTO.Commands;
 using Xunit;
 
 namespace PolicyExample.Tests.Integration
 {
-
-
-    public class PolicyExampleGraphQLClient
+    public class LogicGraphCreationTests
     {
-        public readonly GraphQLHttpClient Client;
-
-        public PolicyExampleGraphQLClient(HttpClient httpClient, string? endpoint=null)
+        //root objects just to parse json faster
+        class CreateNewNodeRootObject
         {
-            var options = new GraphQLHttpClientOptions {EndPoint = new Uri(endpoint ?? "https://localhost:5001/graphql")};
-            Client = new GraphQLHttpClient(options,
-                                            new NewtonsoftJsonSerializer(),
-                                            httpClient);
+            public CreateLogicNodeResult createNewLogicNode { get; set; }
         }
-        public async Task<CreateLogicGraphResult> Execute(CreateLogicGraphCommand command)
+        
+        class CreateNewGraphRootObject
         {
-            int a;
+            public CreateLogicGraphResult createNewLogicGraph { get; set; }
+        }
+        
+        class RunLogicGraphRootObject
+        {
+            public RunLogicGraphResult runLogicGraph { get; set; }
+        }
+        
+        [Fact]
+        public async Task Given_createLogicGraph_command_When_executing_it_Then_receive_new_graph_Id()
+        {
+            var client = SetupClient();
             var logicGraphCreationRequest = new GraphQLRequest {
                 Query = @"
 mutation CreateNewGraph($command: CreateLogicGraphCommand) {
@@ -43,84 +49,17 @@ mutation CreateNewGraph($command: CreateLogicGraphCommand) {
           logicGraphId
     }
   }
-}",
-                Variables = new
-                {
-                    command
-                }
-            };
-            
-            var res = await Client.SendMutationAsync<CreateNewGraphRootObject>(logicGraphCreationRequest);
-            if (res.Errors?.Any()==true)
-            {
-                throw new GraphQLException(res.Errors);
-            }
-            if (res.Data==null)
-            {
-                throw new GraphQLException("received null Data response");
-            }
-            
-            return res.Data.createNewLogicGraph;
-        }
-        
-        class CreateNewGraphRootObject
-        {
-            public CreateLogicGraphResult createNewLogicGraph { get; set; }
-        }
-
-        class CreateNewNodeRootObject
-        {
-            public CreateLogicNodeResult createNewLogicNode { get; set; }
-        }
-    
-        class RunLogicGraphRootObject
-        {
-            public RunLogicGraphResult runLogicGraph { get; set; }
-        }
-
-    }
-
-    public class GraphQLException : Exception
-    {
-        public GraphQLError[]? Errors { get; }
-
-        public GraphQLException(GraphQLError[]? errors)
-        {
-            Errors = errors;
-        }
-        public GraphQLException(string message):base(message)
-        {
-        }
-    }
-
-
-    public class LogicGraphCreationTests
-    {
-        [Fact]
-        public async Task Given_createLogicGraph_command_When_executing_it_Then_receive_new_graph_Id()
-        {
-            var client = SetupClient();
-            var logicGraphCreationRequest = new GraphQLRequest {
-                    Query = @"
-mutation CreateNewGraph($command: CreateLogicGraphCommand) {
-  createNewLogicGraph(command: $command){
-    success
-    errors
-    ... on CreateLogicGraphResult{
-          logicGraphId
-    }
-  }
 }"
-                };
+            };
 
             logicGraphCreationRequest.Variables = new 
-                                {
-                                     command = new {
-                                         id="abc",
-                                         name= "new graph",
-                                         providedEngines = new []{"a","b","c"}
-                                     }
-                                };
+            {
+                command = new {
+                    id="abc",
+                    name= "new graph",
+                    providedEngines = new []{"a","b","c"}
+                }
+            };
 
             var res = await client.SendMutationAsync<CreateNewGraphRootObject>(logicGraphCreationRequest);
 
@@ -172,7 +111,7 @@ mutation CreateNewNode {
             }
         }"
             };
-
+            
             var nodeResult = await client.SendMutationAsync<CreateNewNodeRootObject>(logicNodeCreationRequest);
             nodeResult.Data.createNewLogicNode.Success.Should().BeTrue();
             nodeResult.Data.createNewLogicNode.LogicNodeId.Should().NotBeNullOrEmpty();
@@ -231,49 +170,70 @@ mutation CreateNewNode {
             var res = await graphQlClient.Execute(createLogicGraphCommand);
             var graphId = res.LogicGraphId;
 
-            var logicNodeCreationRequest = new GraphQLRequest
-            {
-                Query = @"
-mutation CreateNewNode {
-  createNewLogicNode(command: {
-    id: ""2""
-    name: ""root node""
-    logicGraphId:""" + graphId + @"""
-            }){
-                errors
-                success
-                    ... on CreateLogicNodeResult{
-                    logicNodeId
-                }
-            }
-        }"
-            };
+            var createLogicNodeCommand = new CreateLogicNodeCommand(){Id = "2", Name = "root node", LogicGraphId = graphId};
+            var nodeResult = await graphQlClient.Execute(createLogicNodeCommand);
 
-            var nodeResult = await client.SendMutationAsync<CreateNewNodeRootObject>(logicNodeCreationRequest);
+            var runGraphCommand = new RunLogicGraphCommand() {Id = "3", LogicGraphId = graphId};
+            var runResult = await graphQlClient.Execute(runGraphCommand);
+
+            runResult.RunReport.Trace.Should().NotBeNullOrEmpty();
+        }
+        
+        [Fact]
+        public async Task Given_complex_graph_When_running_it_with_jint_script_Then_it_affect_execution_flow()
+        {
+            var client = new PolicyExampleGraphQLClient(SetupTestHostAndClient());
+
+            var createLogicGraphResult = await client.Execute(
+                new CreateLogicGraphCommand(){Id="abc",
+                                              Name="new graph", 
+                                              ProvidedContexts = new List<string>{"a","b","c"}
+                }
+            );
             
-            var runLogicGraphRequest = new GraphQLRequest
-            {
-                Query = @"
-mutation RunLogicGraph {
-  runLogicGraph(command: {
-    id: ""3""
-    logicGraphId:""" + graphId + @"""
-            }){
-                success
-                runReport
-                {
-                  trace{
-                    node{
-                       name
-                    }
-                  }
-                }
-            }
-        }"
-            };
-            var trace = await client.SendMutationAsync<RunLogicGraphRootObject>(runLogicGraphRequest);
+            var graphId = createLogicGraphResult.LogicGraphId;
 
-            trace.Data.runLogicGraph.RunReport.Trace.Should().NotBeNullOrEmpty();
+            var rootNode = await client.CreateNode(graphId, "root node");
+            var aNode =  await client.CreateNode(graphId, "A",rootNode.LogicNodeId);
+            var bNode =  await client.CreateNode(graphId, "B",rootNode.LogicNodeId, script:"flow.RedirectToChild(1)");
+            var aaNode = await client.CreateNode(graphId, "AA",aNode.LogicNodeId);
+            var abNode = await client.CreateNode(graphId, "AB",aNode.LogicNodeId);
+            var baNode = await client.CreateNode(graphId, "BA",bNode.LogicNodeId);
+            var bbNode = await client.CreateNode(graphId, "BB",bNode.LogicNodeId);
+
+            var runResult = await client.Execute(new RunLogicGraphCommand() {Id = "3", LogicGraphId = graphId});
+
+            runResult.RunReport.Trace.Select(t => t.Node.Name)
+                .Should().Equal("root node","A", "AA", "AB", "B", "BB", "BA");
+        }
+        
+         
+        [Fact]
+        public async Task Given_complex_graph_When_running_it_with_jint_script_real()
+        {
+            var client = new PolicyExampleGraphQLClient(new HttpClient());
+
+            var createLogicGraphResult = await client.Execute(
+                new CreateLogicGraphCommand(){Id="abc",
+                    Name="new graph for run", 
+                    ProvidedContexts = new List<string>{"a","b","c"}
+                }
+            );
+            
+            var graphId = createLogicGraphResult.LogicGraphId;
+
+            var rootNode = await client.CreateNode(graphId, "root node");
+            var aNode =  await client.CreateNode(graphId, "A",rootNode.LogicNodeId);
+            var bNode =  await client.CreateNode(graphId, "B",rootNode.LogicNodeId, script:"flow.RedirectToChild(1)");
+            var aaNode = await client.CreateNode(graphId, "AA",aNode.LogicNodeId);
+            var abNode = await client.CreateNode(graphId, "AB",aNode.LogicNodeId);
+            var baNode = await client.CreateNode(graphId, "BA",bNode.LogicNodeId);
+            var bbNode = await client.CreateNode(graphId, "BB",bNode.LogicNodeId);
+
+            var runResult = await client.Execute(new RunLogicGraphCommand() {Id = "3", LogicGraphId = graphId});
+
+            runResult.RunReport.Trace.Select(t => t.Node.Name)
+                .Should().Equal("root node","A", "AA", "AB", "B", "BB", "BA");
         }
         
         private static GraphQLHttpClient SetupClient()
@@ -294,21 +254,33 @@ mutation RunLogicGraph {
             var testHttpClient = server.CreateClient();
             return testHttpClient;
         }
-    }
 
-    class CreateNewGraphRootObject
-    {
-        public CreateLogicGraphResult createNewLogicGraph { get; set; }
+       
     }
+    public static class GraphQLCientExtensions
+    {
+        public static async Task<CreateLogicNodeResult> CreateNode(this PolicyExampleGraphQLClient client, string graphId,
+            string nodeName, string? parentId=null, string? script=null)
+        {
+            CreateScriptParams? scriptParams=null;
 
-    class CreateNewNodeRootObject
-    {
-        public CreateLogicNodeResult createNewLogicNode { get; set; }
+            if (script != null)
+            {
+                scriptParams = new CreateScriptParams()
+                {
+                    Body = script,
+                    Language = "JavaScript"
+                };
+            }
+            
+            return await client.Execute(new CreateLogicNodeCommand()
+            {
+                Id = Guid.NewGuid().ToString(),
+                LogicGraphId = graphId,
+                Script = scriptParams,
+                ParentNodeId = parentId,
+                Name = nodeName
+            });
+        }
     }
-    
-    class RunLogicGraphRootObject
-    {
-        public RunLogicGraphResult runLogicGraph { get; set; }
-    }
-
 }

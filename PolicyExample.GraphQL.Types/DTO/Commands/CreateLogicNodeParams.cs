@@ -13,7 +13,7 @@ namespace PolicyExample.GraphQL.Types.DTO.Commands
         [JsonRequired]
         public string Name { get; set; }
     
-        public CreateScriptParams Script { get; set; }
+        public CreateScriptParams? Script { get; set; }
     
         public string? ParentNodeId { get; set; }
         
