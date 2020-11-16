@@ -16,7 +16,7 @@ namespace PolicyExample.Tests
         public async Task Given_graph_with_jint_node_raising_an_error_When_execute_Then_flow_stops()
         {
             var root = new LogicNode() {Name = "root"};
-            var childA = new JintLogicNode()
+            var childA = new LogicNode()
             {
                 Name = "nodeA", Parent = root,
                 Script = new JintScript("bad script")
@@ -49,7 +49,7 @@ namespace PolicyExample.Tests
         public async Task Given_graph_with_jint_node_stopping_flow_When_execute_Then_will_follow_jint_stop_command()
         {
             var root = new LogicNode() {Name = "root"};
-            var childA = new JintLogicNode()
+            var childA = new LogicNode()
             {
                 Name = "nodeA", Parent = root,
                 Script = new JintScript("flow.Stop();")
@@ -79,7 +79,7 @@ namespace PolicyExample.Tests
         public async Task Given_graph_with_jint_node_redirecting_to_not_ordered_child_When_execute_Then_will_follow_jint_redirection()
         {
             var root = new LogicNode() {Name = "root"};
-            var childA = new JintLogicNode()
+            var childA = new LogicNode()
             {
                 Name = "nodeA", Parent = root,
                 Script = new JintScript("flow.RedirectToChild(1);")

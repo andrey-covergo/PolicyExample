@@ -11,6 +11,7 @@ using PolicyExample.Scripting.GraphLogic;
 using PolicyExample.Scripting.Jint;
 using ExecutionError = PolicyExample.Scripting.ExecutionError;
 using LogicGraph = PolicyExample.Scripting.GraphLogic.LogicGraph;
+using LogicNode = PolicyExample.Scripting.GraphLogic.LogicNode;
 using NodeExecutionResult = PolicyExample.GraphQL.Types.DTO.NodeExecutionResult;
 
 namespace PolicyExample.API.GraphQL
@@ -100,7 +101,7 @@ namespace PolicyExample.API.GraphQL
                         var command = ctx.GetArgument<CreateLogicNodeCommand>("command");
                         var graph = persistence.Graphs.First(g => g.Id == command.LogicGraphId);
 
-                        var logicGraphDomainObject = new JintLogicNode()
+                        var logicGraphDomainObject = new LogicNode()
                         {
                             Id = Guid.NewGuid().ToString(),
                             Name = command.Name,

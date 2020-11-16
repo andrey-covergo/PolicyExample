@@ -17,7 +17,7 @@ namespace PolicyExample.Scripting.GraphLogic
         public Task<NodeExecutionResult> ExecuteNode(LogicNode node)
         {
             
-            if (node is JintLogicNode jintLogicNode)
+            if (node is LogicNode jintLogicNode)
             {
                 var service = new NodeFlowService(node);
                 if (jintLogicNode.Script is JintScript jintScript)
