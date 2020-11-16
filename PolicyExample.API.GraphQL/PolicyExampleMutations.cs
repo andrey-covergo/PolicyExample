@@ -8,6 +8,7 @@ using PolicyExample.GraphQL.Types.DTO;
 using PolicyExample.GraphQL.Types.DTO.Commands;
 using PolicyExample.GraphQL.Types.GraphQLTypes;
 using PolicyExample.Scripting.GraphLogic;
+using PolicyExample.Scripting.Jint;
 using ExecutionError = PolicyExample.Scripting.ExecutionError;
 using LogicGraph = PolicyExample.Scripting.GraphLogic.LogicGraph;
 using NodeExecutionResult = PolicyExample.GraphQL.Types.DTO.NodeExecutionResult;
@@ -103,9 +104,9 @@ namespace PolicyExample.API.GraphQL
                         {
                             Id = Guid.NewGuid().ToString(),
                             Name = command.Name,
-                            JavaScript = command.Script?.Body,
-
                         };
+                        if (command.Script?.Body != null)
+                            logicGraphDomainObject.Script = new JintScript(command.Script?.Body);
 
                         if (graph.Graph.Root == null)
                         {

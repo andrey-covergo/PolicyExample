@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using PolicyExample.Scripting.Jint;
 
 namespace PolicyExample.Scripting.GraphLogic
 {
@@ -12,6 +13,7 @@ namespace PolicyExample.Scripting.GraphLogic
         public string Name { get; set; }
         public string Id { get; set; }
 
+        public IScript? Script { get; set; } = null;
         public virtual Task<NodeExecutionResult> Execute()
         {
             return Task.FromResult<NodeExecutionResult>(ExecutionSuccessAndContinue.Instance);

@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Jint;
+using PolicyExample.Scripting.Jint;
 
 namespace PolicyExample.Scripting.GraphLogic
 {
@@ -15,22 +16,24 @@ namespace PolicyExample.Scripting.GraphLogic
         
         public Task<NodeExecutionResult> ExecuteNode(LogicNode node)
         {
+            
             if (node is JintLogicNode jintLogicNode)
             {
-                if (jintLogicNode.JavaScript != null)
+                var service = new NodeFlowService(node);
+                if (jintLogicNode.Script is JintScript jintScript)
                 {
                     try
                     {
-                        _engine.SetValue("flow", jintLogicNode.Facade.Facade);
-                        _engine.Execute(jintLogicNode.JavaScript);
+                        _engine.SetValue("flow", service);
+                        _engine.Execute(jintScript.JavaScriptCode);
                     }
                     catch (Exception ex)
                     {
-                        jintLogicNode.Facade.Result = new ExecutionError(){Message = ex.ToString()}; 
+                        service.Result = new ExecutionError(){Message = ex.ToString()}; 
                     }
                 }
 
-                return   jintLogicNode.Facade.Result== null ? node.Execute() : Task.FromResult(  jintLogicNode.Facade.Result);
+                return   service.Result== null ? node.Execute() : Task.FromResult(service.Result);
             }
 
             return node.Execute();

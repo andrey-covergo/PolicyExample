@@ -1,45 +1,25 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using PolicyExample.Scripting;
 using PolicyExample.Scripting.GraphLogic;
+using PolicyExample.Scripting.Jint;
 using Xunit;
 
 namespace PolicyExample.Tests
 {
-    public class GraphLogicFlowServiceTests
+    public class GraphLogicWithJintTests
     {
-        class TestNode : LogicNode
-        {
-            public Action<NodeFlowService>? Behavior { get; set; }
-        }
 
-        class TestFacadeNodeExecutor : INodeExecutor
-        {
-            public Task<NodeExecutionResult> ExecuteNode(LogicNode node)
-            {
-                if (node is TestNode facadeNode)
-                {
-                    var flowService = new NodeFlowService(facadeNode);
-                    facadeNode.Behavior?.Invoke(flowService);
-
-                    if(flowService.Result != null)
-                        return Task.FromResult(flowService.Result);
-                }
-
-                return node.Execute();
-            }
-        }
-        
         [Fact]
-        public async Task Given_graph_with_nodes_exposing_flow_facade_When_execute_Then_will_follow_facade_stop_command()
+        public async Task Given_graph_with_jint_node_raising_an_error_When_execute_Then_flow_stops()
         {
             var root = new LogicNode() {Name = "root"};
-            var childA = new TestNode()
+            var childA = new JintLogicNode()
             {
                 Name = "nodeA", Parent = root,
-                Behavior = f => f.Stop()
+                Script = new JintScript("bad script")
             };
             var childB = new LogicNode() {Name = "nodeB", Parent = root};
             root.Children.Add(childA);
@@ -50,7 +30,40 @@ namespace PolicyExample.Tests
             
             var graph = new LogicGraph()
             {
-                Root = root, ExecutionFlow = new OrderedExecutionFlow(new TestFacadeNodeExecutor())
+                Root = root, ExecutionFlow = new OrderedExecutionFlow(new JintNodeExecutor())
+            };
+
+            var trace = new List<NodeVisitResult>();
+            await foreach (var visit in graph.Run())
+            {
+                trace.Add(visit);
+            }
+
+            trace.Select(v => v.Node.Name).Should().Equal("root","nodeA");
+
+            var error = trace.Last().Result.Should().BeOfType<ExecutionError>().Subject;
+            error.Message.Should().Contain("Unexpected identifier");
+        }
+            
+        [Fact]
+        public async Task Given_graph_with_jint_node_stopping_flow_When_execute_Then_will_follow_jint_stop_command()
+        {
+            var root = new LogicNode() {Name = "root"};
+            var childA = new JintLogicNode()
+            {
+                Name = "nodeA", Parent = root,
+                Script = new JintScript("flow.Stop();")
+            };
+            var childB = new LogicNode() {Name = "nodeB", Parent = root};
+            root.Children.Add(childA);
+            root.Children.Add(childB);
+
+            var nodeAA = new LogicNode() {Name = "nodeAA", Parent = childA};
+            childA.Children.Add(nodeAA);
+            
+            var graph = new LogicGraph()
+            {
+                Root = root, ExecutionFlow = new OrderedExecutionFlow(new JintNodeExecutor())
             };
 
             var trace = new List<NodeVisitResult>();
@@ -62,15 +75,14 @@ namespace PolicyExample.Tests
             trace.Select(v => v.Node.Name).Should().Equal("root","nodeA");
         }
         
-        
         [Fact]
-        public async Task Given_graph_with_nodes_exposing_flow_facade_When_redirect_to_not_ordered_child_via_facade_Then_will_follow_facade_redirection()
+        public async Task Given_graph_with_jint_node_redirecting_to_not_ordered_child_When_execute_Then_will_follow_jint_redirection()
         {
             var root = new LogicNode() {Name = "root"};
-            var childA = new TestNode()
+            var childA = new JintLogicNode()
             {
                 Name = "nodeA", Parent = root,
-                Behavior = f => f.RedirectToChild(1) //redirect to nodeAB instead of nodeAA
+                Script = new JintScript("flow.RedirectToChild(1);")
             };
             var childB = new LogicNode() {Name = "nodeB", Parent = root};
             root.Children.Add(childA);
@@ -91,7 +103,7 @@ namespace PolicyExample.Tests
             
             var graph = new LogicGraph()
             {
-                Root = root, ExecutionFlow = new OrderedExecutionFlow(new TestFacadeNodeExecutor())
+                Root = root, ExecutionFlow = new OrderedExecutionFlow(new JintNodeExecutor())
             };
 
             var trace = new List<NodeVisitResult>();

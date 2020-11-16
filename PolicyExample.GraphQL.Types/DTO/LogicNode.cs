@@ -7,7 +7,6 @@ namespace PolicyExample.GraphQL.Types.DTO {
     /// </summary>
     public class LogicNode {
    
-      
       public string Id { get; set; }
     
       
