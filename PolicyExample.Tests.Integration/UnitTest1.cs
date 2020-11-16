@@ -14,6 +14,21 @@ using Xunit;
 
 namespace PolicyExample.Tests.Integration
 {
+
+
+    public class PolicyExampleGraphQLClient
+    {
+        public PolicyExampleGraphQLClient()
+        {
+            
+        }
+        public Task<CreateLogicGraphResult> Execute(CreateLogicGraphCommand command)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    
+    
     public class LogicGraphCreationTests
     {
         [Fact]
@@ -22,12 +37,8 @@ namespace PolicyExample.Tests.Integration
             var client = SetupClient();
             var logicGraphCreationRequest = new GraphQLRequest {
                     Query = @"
-mutation CreateNewGraph {
-  createNewLogicGraph(command: {
-    id: ""abc""
-    name: ""new graph""
-    providedEngines: [""a"",""b"",""c""]
-}){
+mutation CreateNewGraph($command: CreateLogicGraphCommand) {
+  createNewLogicGraph(command: $command){
     success
     errors
     ... on CreateLogicGraphResult{
@@ -36,6 +47,15 @@ mutation CreateNewGraph {
   }
 }"
                 };
+
+            logicGraphCreationRequest.Variables = new 
+                                {
+                                     command = new {
+                                         id="abc",
+                                         name= "new graph",
+                                         providedEngines = new []{"a","b","c"}
+                                     }
+                                };
 
             var res = await client.SendMutationAsync<CreateNewGraphRootObject>(logicGraphCreationRequest);
 
@@ -94,7 +114,7 @@ mutation CreateNewNode {
         }
 
         [Fact]
-        public async Task Deserialization_Result()
+        public async Task RunLogicGraph_Result_Deserialization()
         {
             var json = @"
 {
@@ -115,6 +135,23 @@ mutation CreateNewNode {
             var res = JsonConvert.DeserializeObject<RunLogicGraphRootObject>(json);
 
             res.runLogicGraph.RunReport.Trace.Should().NotBeNullOrEmpty();
+        }
+        
+        [Fact]
+        public void Create_Graph_Command_Deserialization_Result()
+        {
+            var json = @"
+            {
+                id: ""abc"",
+                name: ""new graph"",
+                providedEngines: [""a"",""b"",""c""]
+            }
+";
+            var res = JsonConvert.DeserializeObject<CreateLogicGraphCommand>(json);
+
+            res.Name.Should().Be("new graph");
+            res.Id.Should().Be("abc");
+            res.ProvidedEngines.Should().Equal(new []{"a","b","c"});
         }
         
         [Fact]
