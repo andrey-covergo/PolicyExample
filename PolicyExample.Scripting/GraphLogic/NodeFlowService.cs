@@ -1,13 +1,5 @@
 namespace PolicyExample.Scripting.GraphLogic
 {
-    public interface INodeFlowService
-    {
-        void Stop();
-        void RedirectToParent();
-        bool RedirectToChild(int index);
-    }
-   
-
     /// <summary>
     /// Exposed to a script, should not have any public members more than available to a script
     /// </summary>

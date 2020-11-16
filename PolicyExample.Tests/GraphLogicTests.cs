@@ -61,11 +61,11 @@ namespace PolicyExample.Tests
 
         class TestLogicNode : LogicNode
         {
-            public Func<IExecutionFlow,NodeExecutionResult>? Behavior { get; set; }
+            public Func<NodeExecutionResult>? Behavior { get; set; }
 
-            public override Task<NodeExecutionResult> Execute(IExecutionFlow flow)
+            public override Task<NodeExecutionResult> Execute()
             {
-                return Behavior == null ? base.Execute(flow) : Task.FromResult(Behavior.Invoke(flow));
+                return Behavior == null ? base.Execute() : Task.FromResult(Behavior.Invoke());
             }
         }
         [Fact]
@@ -73,7 +73,7 @@ namespace PolicyExample.Tests
         {
             var root = new LogicNode() {Name = "root"};
             var childARedirectParent = new TestLogicNode() {Name = "nodeA", Parent = root, 
-                Behavior = f=> new ExecutionSuccessAndRedirect(root)};
+                Behavior = ()=> new ExecutionSuccessAndRedirect(root)};
             
             var childB = new LogicNode() {Name = "nodeB", Parent = root};
             root.Children.Add(childARedirectParent);
@@ -103,7 +103,7 @@ namespace PolicyExample.Tests
         {
             var root = new LogicNode() {Name = "root"};
             var childAStop = new TestLogicNode() {Name = "nodeA", Parent = root, 
-                Behavior = f=> new ExecutionSuccessAndStop(){Result = 1}};
+                Behavior = ()=> new ExecutionSuccessAndStop(){Result = 1}};
             
             var childB = new LogicNode() {Name = "nodeB", Parent = root};
             root.Children.Add(childAStop);

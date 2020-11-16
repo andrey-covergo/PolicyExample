@@ -12,7 +12,7 @@ namespace PolicyExample.Scripting.GraphLogic
         public string Name { get; set; }
         public string Id { get; set; }
 
-        public virtual Task<NodeExecutionResult> Execute(IExecutionFlow flow)
+        public virtual Task<NodeExecutionResult> Execute()
         {
             return Task.FromResult<NodeExecutionResult>(ExecutionSuccessAndContinue.Instance);
         }

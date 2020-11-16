@@ -1,4 +1,5 @@
 using System;
+using System.Configuration;
 using System.Threading.Tasks;
 using Microsoft.VisualBasic.CompilerServices;
 using PolicyExample.Domain;
@@ -11,7 +12,7 @@ namespace PolicyExample.Tests
 {
     public class PolicyScriptingTests
     {
-        [Fact]
+        [Fact(Skip="Aggregate integration is not ready yet")]
         public async Task Given_scriptedPolicy_When_execute_cmd_Then_script_is_involved()
         {
             // Policy defines the extensions point 

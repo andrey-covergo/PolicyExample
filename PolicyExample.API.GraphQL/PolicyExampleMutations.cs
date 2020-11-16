@@ -29,10 +29,6 @@ namespace PolicyExample.API.GraphQL
     }
     public sealed class PolicyExampleMutations : ObjectGraphType
     {
-
-
-       
-        
         public PolicyExampleMutations(Persistence persistence)
         {
             Field<CommandExecutionResultGraphType>()
@@ -48,7 +44,7 @@ namespace PolicyExample.API.GraphQL
                         Name = command.Name,
                         Graph = new LogicGraph()
                         {
-                            ExecutionFlow = new JintOrderedExecutionFlow()
+                            ExecutionFlow = new OrderedExecutionFlow(new JintNodeExecutor())
                         }
                     };
                     

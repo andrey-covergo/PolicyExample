@@ -9,9 +9,9 @@ namespace PolicyExample.Scripting.GraphLogic
         {   
             Facade = new NodeFlowService(this);
         }
-        public override Task<NodeExecutionResult> Execute(IExecutionFlow flow)
+        public override Task<NodeExecutionResult> Execute()
         {
-            return Facade.Result == null ? base.Execute(flow) : Task.FromResult(Facade.Result);
+            return Facade.Result == null ? base.Execute() : Task.FromResult(Facade.Result);
         }
     }
 }

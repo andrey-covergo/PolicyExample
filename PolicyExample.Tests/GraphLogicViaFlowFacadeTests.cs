@@ -31,7 +31,7 @@ namespace PolicyExample.Tests
             
             var graph = new LogicGraph()
             {
-                Root = root, ExecutionFlow = new JintOrderedExecutionFlow()
+                Root = root, ExecutionFlow = new OrderedExecutionFlow(new JintNodeExecutor())
             };
 
             var trace = new List<NodeVisitResult>();
@@ -64,7 +64,7 @@ namespace PolicyExample.Tests
             
             var graph = new LogicGraph()
             {
-                Root = root, ExecutionFlow = new JintOrderedExecutionFlow()
+                Root = root, ExecutionFlow = new OrderedExecutionFlow(new JintNodeExecutor())
             };
 
             var trace = new List<NodeVisitResult>();
@@ -104,7 +104,7 @@ namespace PolicyExample.Tests
             
             var graph = new LogicGraph()
             {
-                Root = root, ExecutionFlow = new JintOrderedExecutionFlow()
+                Root = root, ExecutionFlow = new OrderedExecutionFlow(new JintNodeExecutor())
             };
 
             var trace = new List<NodeVisitResult>();
@@ -126,10 +126,10 @@ namespace PolicyExample.Tests
         {
             public Action<NodeFlowService>? Behavior { get; set; }
 
-            public override Task<NodeExecutionResult> Execute(IExecutionFlow flow)
+            public override Task<NodeExecutionResult> Execute()
             {
                 Behavior?.Invoke(Facade);
-                return base.Execute(flow);
+                return base.Execute();
             }
         }
         

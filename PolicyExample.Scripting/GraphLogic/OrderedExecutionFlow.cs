@@ -1,59 +1,35 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Jint;
 using Jint.Parser.Ast;
 
 namespace PolicyExample.Scripting.GraphLogic
 {
 
-
-    public class JintLogicNode : LogicNodeWithFacade
+    public interface INodeExecutor
     {
-        public string? JavaScript { get; set; }
-
-        public Task<NodeExecutionResult> Execute(Engine engine, IExecutionFlow flow)
-        {
-            if (JavaScript != null)
-            {
-                try
-                {
-                    engine.SetValue("flow", Facade.Facade);
-                    engine.Execute(JavaScript);
-                }
-                catch (Exception ex)
-                {
-                    Facade.Result = new ExecutionError(){Message = ex.ToString()}; 
-                }
-            }
-
-            return base.Execute(flow);
-        }
+        Task<NodeExecutionResult> ExecuteNode(LogicNode node);
     }
-    public class JintOrderedExecutionFlow : OrderedExecutionFlow
+
+    public class DefaultNodeExecutor:INodeExecutor
     {
-        private readonly Engine _engine;
-
-        public JintOrderedExecutionFlow()
+        public Task<NodeExecutionResult> ExecuteNode(LogicNode node)
         {
-            _engine = new Engine();
-        }
 
-        protected override Task<NodeExecutionResult> ExecuteNode(LogicNode node)
-        {
-            if (node is JintLogicNode jintLogicNode)
-            {
-                return jintLogicNode.Execute(_engine, this);
-            }
-            return base.ExecuteNode(node);
+            return node.Execute();
         }
     }
     
     public class OrderedExecutionFlow:IExecutionFlow
     {
+        public OrderedExecutionFlow(INodeExecutor? nodeExecutor=null)
+        {
+            _nodeExecutor = nodeExecutor ?? new DefaultNodeExecutor();
+        }
         private readonly Stack<LogicNode> _visitHistory = new Stack<LogicNode>();
+        private readonly INodeExecutor _nodeExecutor;
+
         public async Task<NodeVisitResult> Visit(LogicNode? node)
         {
             if (node == null)
@@ -87,7 +63,7 @@ namespace PolicyExample.Scripting.GraphLogic
 
         protected virtual async Task<NodeExecutionResult> ExecuteNode(LogicNode node)
         {
-            return await node.Execute(this);
+            return await _nodeExecutor.ExecuteNode(node);
         }
 
         protected NodeVisitResult ProcessNodeResponse(LogicNode node, NodeExecutionResult executionResult)
@@ -120,10 +96,5 @@ namespace PolicyExample.Scripting.GraphLogic
 
             throw new UnsupportedNodeExecutionResultException();
         }
-    }
-
-    public class UnsupportedNodeExecutionResultException : Exception
-    {
-        
     }
 }
