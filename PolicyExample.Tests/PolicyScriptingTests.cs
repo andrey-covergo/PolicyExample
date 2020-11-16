@@ -29,7 +29,6 @@ namespace PolicyExample.Tests
 
             var result = await policy.Execute(new IssuePolicyCommand(policyCreatedEvent.Source));
             
-            
             throw new NotImplementedException();
         }
     }

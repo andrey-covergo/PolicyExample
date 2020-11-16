@@ -7,6 +7,7 @@ using GraphQL.Client.Serializer.Newtonsoft;
 using GraphQL.Client.Serializer.SystemTextJson;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Newtonsoft.Json;
 using PolicyExample.API.GraphQL;
 using PolicyExample.GraphQL.Types.DTO.Commands;
 using Xunit;
@@ -92,6 +93,29 @@ mutation CreateNewNode {
             nodeResult.Data.createNewLogicNode.LogicNodeId.Should().NotBeNullOrEmpty();
         }
 
+        [Fact]
+        public async Task Deserialization_Result()
+        {
+            var json = @"
+{
+  ""runLogicGraph"": {
+            ""success"": true,
+            ""runReport"": {
+                ""trace"": [
+                {
+                    ""node"": {
+                        ""name"": ""root node""
+                    }
+                }
+                ]
+            }
+        }
+    }
+";
+            var res = JsonConvert.DeserializeObject<RunLogicGraphRootObject>(json);
+
+            res.runLogicGraph.RunReport.Trace.Should().NotBeNullOrEmpty();
+        }
         
         [Fact]
         public async Task Given_graph_When_running_it_Then_receive_trace()
@@ -150,13 +174,14 @@ mutation RunLogicGraph {
                 runReport
                 {
                   trace{
-                    nodeID
+                    node{
+                       name
+                    }
                   }
                 }
             }
         }"
             };
-            var traceA = await client.SendMutationAsync<object>(runLogicGraphRequest);
             var trace = await client.SendMutationAsync<RunLogicGraphRootObject>(runLogicGraphRequest);
 
             trace.Data.runLogicGraph.RunReport.Trace.Should().NotBeNullOrEmpty();
