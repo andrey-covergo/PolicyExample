@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Jint;
 
@@ -16,7 +17,20 @@ namespace PolicyExample.Scripting.GraphLogic
         {
             if (node is JintLogicNode jintLogicNode)
             {
-                return jintLogicNode.Execute(_engine);
+                if (jintLogicNode.JavaScript != null)
+                {
+                    try
+                    {
+                        _engine.SetValue("flow", jintLogicNode.Facade.Facade);
+                        _engine.Execute(jintLogicNode.JavaScript);
+                    }
+                    catch (Exception ex)
+                    {
+                        jintLogicNode.Facade.Result = new ExecutionError(){Message = ex.ToString()}; 
+                    }
+                }
+
+                return   jintLogicNode.Facade.Result== null ? node.Execute() : Task.FromResult(  jintLogicNode.Facade.Result);
             }
 
             return node.Execute();

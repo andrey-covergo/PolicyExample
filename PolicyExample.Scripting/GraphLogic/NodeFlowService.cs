@@ -1,3 +1,7 @@
+using System.Reflection;
+using System.Runtime.CompilerServices;
+[assembly: InternalsVisibleTo("PolicyExample.Tests")] 
+
 namespace PolicyExample.Scripting.GraphLogic
 {
     /// <summary>

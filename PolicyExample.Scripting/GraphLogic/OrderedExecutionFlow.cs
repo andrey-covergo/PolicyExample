@@ -16,7 +16,6 @@ namespace PolicyExample.Scripting.GraphLogic
     {
         public Task<NodeExecutionResult> ExecuteNode(LogicNode node)
         {
-
             return node.Execute();
         }
     }

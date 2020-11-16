@@ -132,6 +132,22 @@ namespace PolicyExample.Tests
                 return base.Execute();
             }
         }
+
+        class TestFacadeNodeExecutor : INodeExecutor
+        {
+            public Task<NodeExecutionResult> ExecuteNode(LogicNode node)
+            {
+                if (node is TestFacadeNode facadeNode)
+                {
+                    facadeNode.Behavior?.Invoke(facadeNode.Facade);
+
+                    if(facadeNode.Facade.Result != null)
+                        return Task.FromResult(facadeNode.Facade.Result);
+                }
+
+                return node.Execute();
+            }
+        }
         
         [Fact]
         public async Task Given_graph_with_nodes_exposing_flow_facade_When_execute_Then_will_follow_facade_stop_command()
@@ -151,7 +167,7 @@ namespace PolicyExample.Tests
             
             var graph = new LogicGraph()
             {
-                Root = root, ExecutionFlow = new OrderedExecutionFlow()
+                Root = root, ExecutionFlow = new OrderedExecutionFlow(new TestFacadeNodeExecutor())
             };
 
             var trace = new List<NodeVisitResult>();
@@ -192,7 +208,7 @@ namespace PolicyExample.Tests
             
             var graph = new LogicGraph()
             {
-                Root = root, ExecutionFlow = new OrderedExecutionFlow()
+                Root = root, ExecutionFlow = new OrderedExecutionFlow(new TestFacadeNodeExecutor())
             };
 
             var trace = new List<NodeVisitResult>();
