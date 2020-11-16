@@ -16,24 +16,19 @@ namespace PolicyExample.Scripting.GraphLogic
         
         public Task<NodeExecutionResult> ExecuteNode(LogicNode node)
         {
-            
-            if (node is LogicNode jintLogicNode)
+            if (node.Script is JintScript jintScript)
             {
                 var service = new NodeFlowService(node);
-                if (jintLogicNode.Script is JintScript jintScript)
+                try
                 {
-                    try
-                    {
-                        _engine.SetValue("flow", service);
-                        _engine.Execute(jintScript.JavaScriptCode);
-                    }
-                    catch (Exception ex)
-                    {
-                        service.Result = new ExecutionError(){Message = ex.ToString()}; 
-                    }
+                    _engine.SetValue("flow", service);
+                    _engine.Execute(jintScript.JavaScriptCode);
                 }
-
-                return   service.Result== null ? node.Execute() : Task.FromResult(service.Result);
+                catch (Exception ex)
+                {
+                    service.Result = new ExecutionError(){Message = ex.ToString()}; 
+                }
+                return service.Result== null ? node.Execute() : Task.FromResult(service.Result);
             }
 
             return node.Execute();

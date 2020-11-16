@@ -6,20 +6,6 @@ using Jint.Parser.Ast;
 
 namespace PolicyExample.Scripting.GraphLogic
 {
-
-    public interface INodeExecutor
-    {
-        Task<NodeExecutionResult> ExecuteNode(LogicNode node);
-    }
-
-    public class DefaultNodeExecutor:INodeExecutor
-    {
-        public Task<NodeExecutionResult> ExecuteNode(LogicNode node)
-        {
-            return node.Execute();
-        }
-    }
-    
     public class OrderedExecutionFlow:IExecutionFlow
     {
         public OrderedExecutionFlow(INodeExecutor? nodeExecutor=null)
