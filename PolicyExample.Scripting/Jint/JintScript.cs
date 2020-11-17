@@ -2,16 +2,17 @@ using System.Collections.Generic;
 
 namespace PolicyExample.Scripting.Jint
 {
-    public class JintScript:IScript
+    public class JSScript:IScript
     {
-        public JintScript(string javaScriptCode)
+        public JSScript(string javaScriptCode, Language? language=null, params ScriptService[] services)
         {
-            JavaScriptCode = javaScriptCode;
+            Code = javaScriptCode;
+            Language = language ?? Language.JavaScriptEs5;
+            RequiredServices = services;
         }
 
-        public string JavaScriptCode { get;  }
-        public string Code => JavaScriptCode;
-        public Language Language { get; } = Language.JavaScriptEs5;
-        public IReadOnlyCollection<ScriptService> RequiredServices { get; set; } = new ScriptService[]{};
+        public string Code { get; }
+        public Language Language { get; } 
+        public IReadOnlyCollection<ScriptService> RequiredServices { get; }
     }
 }

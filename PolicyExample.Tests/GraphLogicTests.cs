@@ -53,7 +53,7 @@ namespace PolicyExample.Tests
                 Root = root, ExecutionFlow = new OrderedExecutionFlow()
             };
 
-             await graph.Run().ToListAsync();
+            await graph.Run().ToListAsync();
             
             var secondRun = await graph.Run().ToListAsync();
             secondRun.Select(v => v.Node.Name).Should().Equal("root","nodeA", "nodeAA", "nodeB");
@@ -62,12 +62,21 @@ namespace PolicyExample.Tests
         class TestLogicNode : LogicNode
         {
             public Func<NodeExecutionResult>? Behavior { get; set; }
+        }
 
-            public override Task<NodeExecutionResult> Execute()
+        class TestNodeExecutor : INodeExecutor
+        {
+            public Task<NodeExecutionResult> ExecuteNode(LogicNode node)
             {
-                return Behavior == null ? base.Execute() : Task.FromResult(Behavior.Invoke());
+                if (node is TestLogicNode testNode && testNode.Behavior != null)
+                {
+                    return Task.FromResult(testNode.Behavior.Invoke());
+                }
+
+                return Task.FromResult<NodeExecutionResult>(ExecutionSuccessAndContinue.Instance);
             }
         }
+        
         [Fact]
         public async Task Given_nodes_changing_direction_When_execute_Then_will_follow_it_commands()
         {
@@ -84,7 +93,7 @@ namespace PolicyExample.Tests
             
             var graph = new LogicGraph()
             {
-                Root = root, ExecutionFlow = new OrderedExecutionFlow()
+                Root = root, ExecutionFlow = new OrderedExecutionFlow(new TestNodeExecutor())
             };
 
             var trace = new List<NodeVisitResult>();
@@ -111,7 +120,7 @@ namespace PolicyExample.Tests
 
             var graph = new LogicGraph()
             {
-                Root = root, ExecutionFlow = new OrderedExecutionFlow()
+                Root = root, ExecutionFlow = new OrderedExecutionFlow(new TestNodeExecutor())
             };
 
             var trace = new List<NodeVisitResult>();

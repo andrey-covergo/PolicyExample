@@ -26,8 +26,6 @@ namespace PolicyExample.API.GraphQL
     public class Persistence
     {
         public readonly List<LogicGraphEntity> Graphs = new List<LogicGraphEntity>();
-        
-        
     }
     public sealed class PolicyExampleMutations : ObjectGraphType
     {
@@ -107,7 +105,7 @@ namespace PolicyExample.API.GraphQL
                             Name = command.Name,
                         };
                         if (command.Script?.Body != null)
-                            logicGraphDomainObject.Script = new JintScript(command.Script?.Body);
+                            logicGraphDomainObject.Script = new JSScript(command.Script?.Body);
 
                         if (graph.Graph.Root == null)
                         {

@@ -6,7 +6,7 @@ namespace PolicyExample.Scripting.GraphLogic
     {
         public Task<NodeExecutionResult> ExecuteNode(LogicNode node)
         {
-            return node.Execute();
+            return  Task.FromResult<NodeExecutionResult>(ExecutionSuccessAndContinue.Instance);
         }
     }
 }

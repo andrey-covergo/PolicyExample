@@ -10,7 +10,7 @@ using LogicNode = PolicyExample.GraphQL.Types.DTO.LogicNode;
 namespace PolicyExample.API.GraphQL
 {
     
-   
+
     public sealed class PolicyExampleQueries : ObjectGraphType
     {
         public PolicyExampleQueries(Persistence persistence)

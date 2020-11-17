@@ -28,7 +28,7 @@ namespace PolicyExample.Tests
                         return Task.FromResult(flowService.Result);
                 }
 
-                return node.Execute();
+                return Task.FromResult<NodeExecutionResult>(ExecutionSuccessAndContinue.Instance);
             }
         }
         

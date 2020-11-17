@@ -13,11 +13,7 @@ namespace PolicyExample.Scripting.GraphLogic
         public string Name { get; set; }
         public string Id { get; set; }
 
-        public IScript? Script { get; set; } = null;
-        public virtual Task<NodeExecutionResult> Execute()
-        {
-            return Task.FromResult<NodeExecutionResult>(ExecutionSuccessAndContinue.Instance);
-        }
+        public IScript? Script { get; set; }
 
         public override string ToString()
         {
