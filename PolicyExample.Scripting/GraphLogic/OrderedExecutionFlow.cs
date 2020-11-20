@@ -48,7 +48,7 @@ namespace PolicyExample.Scripting.GraphLogic
 
         protected virtual async Task<NodeExecutionResult> ExecuteNode(LogicNode node)
         {
-            return await _nodeExecutor.ExecuteNode(node);
+            return await _nodeExecutor.Execute(node);
         }
 
         protected NodeVisitResult ProcessNodeResponse(LogicNode node, NodeExecutionResult executionResult)

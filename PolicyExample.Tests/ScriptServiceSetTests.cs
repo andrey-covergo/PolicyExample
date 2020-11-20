@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using FluentAssertions;
 using PolicyExample.Scripting.Jint;
 using Xunit;
@@ -7,16 +8,26 @@ namespace PolicyExample.Tests
     public class ScriptServiceSetTests
     {
         [Fact]
-        public void Given_service_set_When_injecting_existing_services_When_injector_is_called_with_provided_service()
+        public void Given_service_set_When_injecting_existing_services_When_injector_is_called_with_provided_service_and_schemas()
         {
             var set = new ScriptServiceSet();
             var service = new object();
-            set.Add(new ScriptService(){Name="Test service", Version = 1}, service );
+            var descriptor = new ScriptService(){Name="Test service", Version = 1};
+            set.Add(descriptor, service );
 
             object? resolved=null;
-            set.Inject(s=>resolved = s, new ScriptService(){Name="Test service", Version = 1});
+            IReadOnlyCollection<ScriptServiceSchema> schemas=null;
+            
+            set.Inject((sc,s)=>
+            {
+                
+                resolved = s;
+                schemas = sc;
+
+            }, descriptor);
 
             resolved.Should().Be(service);
+            schemas.Should().BeEquivalentTo(ScriptServiceSchema.Default(descriptor));
         }
         
         [Fact]
@@ -27,7 +38,7 @@ namespace PolicyExample.Tests
             set.Add(new ScriptService(){Name="Test service", Version = 1}, service );
 
             object resolved;
-            set.Invoking(s => s.Inject(s => { }, new ScriptService(){Name="Test serviceA", Version = 1}))
+            set.Invoking(s => s.Inject((sc,s) => { }, new ScriptService(){Name="Test serviceA", Version = 1}))
                 .Should().Throw<MissingServiceException>();
         }
         
@@ -38,7 +49,7 @@ namespace PolicyExample.Tests
             var service = new object();
             set.Add(new ScriptService(){Name="Test service", Version = 1}, service );
 
-            set.Invoking(s => s.Inject(s => { }, new ScriptService(){Name="Test service", Version = 2}))
+            set.Invoking(s => s.Inject((sc,s) => { }, new ScriptService(){Name="Test service", Version = 2}))
                 .Should()
                 .Throw<MissingServiceException>();
         }
@@ -56,9 +67,17 @@ namespace PolicyExample.Tests
             };
             
             set.Add(scriptService, service, scriptServiceSchema );
-            set.TryGetDescription(scriptService, out var schema).Should().BeTrue();
+
+            IReadOnlyCollection<ScriptServiceSchema>? resolvedSchema=null;
+            object? resolvedService=null;
+            set.Inject((sc, s) =>
+            {
+                resolvedSchema = sc;
+                resolvedService = s;
+            },scriptService);
             
-            schema.Should().Be(scriptServiceSchema);
+            resolvedService.Should().Be(service);
+            resolvedSchema.Should().BeEquivalentTo(scriptServiceSchema);
         }
         
         [Fact]
@@ -74,48 +93,17 @@ namespace PolicyExample.Tests
             };
             
             set.Add(scriptService, service, scriptServiceSchema );
-            set.TryGetDescription(scriptService, out var schema,Language.JavaScriptEs5).Should().BeTrue();
             
-            schema.Should().Be(scriptServiceSchema);
-        }
-        
-        [Fact]
-        public void Given_service_set_When_getting_description_for_missing_services_Then_result_is_null()
-        {
-            var set = new ScriptServiceSet();
-            var service = new object();
-            var scriptService = new ScriptService(){Name="Test service", Version = 1};
-            var scriptServiceSchema = new ScriptServiceSchema()
+            IReadOnlyCollection<ScriptServiceSchema>? resolvedSchema=null;
+            object? resolvedService=null;
+            set.Inject((sc, s) =>
             {
-                AccessName = "test"
-            };
+                resolvedSchema = sc;
+                resolvedService = s;
+            },scriptService);
             
-            set.Add(scriptService, service, scriptServiceSchema );
-            
-            set.TryGetDescription(new ScriptService(){Name="Test service B", Version = 1}, out var schema).Should().BeFalse();
-            
-            schema.Should().BeNull();
-        }
-        
-           
-        [Fact]
-        public void Given_service_set_When_getting_description_for_existing_services_but_missing_language_Then_result_is_null()
-        {
-            var set = new ScriptServiceSet();
-            var service = new object();
-            var scriptService = new ScriptService(){Name="Test service", Version = 1};
-            var scriptServiceSchema = new ScriptServiceSchema()
-            {
-                AccessName = "test",
-                Language = Language.JavaScriptEs5
-            };
-            
-            set.Add(scriptService, service, scriptServiceSchema );
-            
-            set.TryGetDescription(new ScriptService(){Name="Test service B", Version = 1}, out var schema, Language.JavaScriptEs6)
-                .Should().BeFalse();
-            
-            schema.Should().BeNull();
+            resolvedService.Should().Be(service);
+            resolvedSchema.Should().BeEquivalentTo(scriptServiceSchema);
         }
     }
 }

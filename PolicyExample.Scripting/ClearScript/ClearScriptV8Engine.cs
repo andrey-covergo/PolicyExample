@@ -14,19 +14,15 @@ namespace PolicyExample.Scripting.Jint
     {
         private readonly IDictionary<ScriptService, List<ScriptServiceSchema>> _schemes = new Dictionary<ScriptService,List<ScriptServiceSchema>>();
         private readonly IDictionary<ScriptService, object> _services = new Dictionary<ScriptService,object>();
-        private readonly Slugity _slugity= new Slugity();
 
-        public ScriptServiceSet()
-        {
-        }
         public void Add(ScriptService descriptor, object service, ScriptServiceSchema? schema = null)
         {
             _services.Add(descriptor,service);
-            schema ??= new ScriptServiceSchema() {AccessName = _slugity.GenerateSlug(descriptor.Name)};
+            schema ??= ScriptServiceSchema.Default(descriptor);
             _schemes.Add(descriptor,new List<ScriptServiceSchema>(){schema});
         }
 
-        public bool TryGetDescription(ScriptService service, out ScriptServiceSchema? schema,Language? language = null)
+        private bool TryGetDescription(ScriptService service, out ScriptServiceSchema? schema,Language? language = null)
         {
             schema = null;
             var result = _schemes.TryGetValue(service, out var schemas);
@@ -37,14 +33,20 @@ namespace PolicyExample.Scripting.Jint
             return result;
         }
 
-        public void Inject(Action<object> injector, params ScriptService[] required)
+        public bool Contains(IReadOnlyCollection<ScriptService> required)
+        {
+            return required.All(r => _services.ContainsKey(r));
+        }
+
+        public void Inject(Action<IReadOnlyCollection<ScriptServiceSchema>,object> injector, params ScriptService[] required)
         {
             foreach (var requiredService in required)
             {
                 if (!_services.TryGetValue(requiredService, out var service))
                     throw new MissingServiceException();
                 
-                injector.Invoke(service);
+                var schemas = _schemes[requiredService];
+                 injector.Invoke(schemas, service);
             }
         }
     }

@@ -115,7 +115,7 @@ namespace PolicyExample.API.GraphQL
                                 {Success = true, LogicNodeId = logicGraphDomainObject.Id};
                         }
 
-                        var parentNode = graph.Graph.Root.GetAllChildrenNodes()
+                        var parentNode = graph.Graph.Root.GetTree()
                             .FirstOrDefault(n => n.Id == command.ParentNodeId);
 
                         if (parentNode == null)

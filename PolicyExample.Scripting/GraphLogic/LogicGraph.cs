@@ -24,14 +24,5 @@ namespace PolicyExample.Scripting.GraphLogic
                 currentNode = res.NextNode;
             }
         }
-
-        public void Validate()
-        {
-            throw new System.NotImplementedException();
-        }
-    }
-    
-    public class MissingScriptServicesException:Exception
-    {
     }
 }

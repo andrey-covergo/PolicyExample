@@ -17,7 +17,7 @@ namespace PolicyExample.Tests
 
         class TestFacadeNodeExecutor : INodeExecutor
         {
-            public Task<NodeExecutionResult> ExecuteNode(LogicNode node)
+            public Task<NodeExecutionResult> Execute(LogicNode node)
             {
                 if (node is TestNode facadeNode)
                 {
@@ -29,6 +29,11 @@ namespace PolicyExample.Tests
                 }
 
                 return Task.FromResult<NodeExecutionResult>(ExecutionSuccessAndContinue.Instance);
+            }
+
+            public void Validate(LogicNode node)
+            {
+                
             }
         }
         

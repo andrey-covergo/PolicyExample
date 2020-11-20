@@ -1,4 +1,6 @@
 using System;
+using System.Data;
+using SlugityLib;
 
 namespace PolicyExample.Scripting.Jint
 {
@@ -6,14 +8,20 @@ namespace PolicyExample.Scripting.Jint
     public class KnownServices
     {
         public static ScriptService ExecutionFlowService = new ScriptService() {Name = "Execution flow service"};
+        public static ScriptServiceSchema ExecutionFlowServiceSchema =  new ScriptServiceSchema() {AccessName = "flow"};
     }
 
     public class ScriptServiceSchema
     {
         public string AccessName { get; set; }
         public string Description { get; set; }
-        public Language Language { get; set; }
+        public Language? Language { get; set; }
         public string Version { get; set; }
+        private static Slugity _slugity= new Slugity();
+        public static ScriptServiceSchema Default(ScriptService service)
+        {
+            return new ScriptServiceSchema() {AccessName = _slugity.GenerateSlug(service.Name)};
+        }
     }
     
     public class ScriptService : IEquatable<ScriptService>
