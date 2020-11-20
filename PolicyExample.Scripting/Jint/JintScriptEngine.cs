@@ -5,7 +5,7 @@ using PolicyExample.Scripting.Abstractions;
 
 namespace PolicyExample.Scripting.Jint
 {
-    public class JintScriptEngine:IScriptEngine<JSScript>
+    public class JintScriptEngine:IScriptEngine<Script>
     {
         private readonly Engine _engine;
 
@@ -13,7 +13,7 @@ namespace PolicyExample.Scripting.Jint
         {
             _engine = new Engine();
         }
-        public Task<IRunResult> Run<T>(JSScript script, IScriptEnvironment<T> externalEnvironment)
+        public Task<IRunResult> Run<T>(Script script, IScriptEnvironment<T> externalEnvironment)
         {
             //TODO: add checks for script context type, version and environment
 

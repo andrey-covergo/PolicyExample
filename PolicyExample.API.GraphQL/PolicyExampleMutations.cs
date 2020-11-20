@@ -13,6 +13,7 @@ using ExecutionError = PolicyExample.Scripting.ExecutionError;
 using LogicGraph = PolicyExample.Scripting.GraphLogic.LogicGraph;
 using LogicNode = PolicyExample.Scripting.GraphLogic.LogicNode;
 using NodeExecutionResult = PolicyExample.GraphQL.Types.DTO.NodeExecutionResult;
+using Script = PolicyExample.Scripting.Jint.Script;
 
 namespace PolicyExample.API.GraphQL
 {
@@ -105,7 +106,7 @@ namespace PolicyExample.API.GraphQL
                             Name = command.Name,
                         };
                         if (command.Script?.Body != null)
-                            logicGraphDomainObject.Script = new JSScript(command.Script?.Body);
+                            logicGraphDomainObject.Script = new Script(command.Script?.Body);
 
                         if (graph.Graph.Root == null)
                         {

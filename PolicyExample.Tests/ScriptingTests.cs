@@ -23,8 +23,8 @@ namespace PolicyExample.Tests
         [Fact]
         public async Task Given_testScriptEngine_When_executing_script_Then_Script_can_manipulate_context()
         {
-            IScriptEngine<JSScript> engine = new JintScriptEngine();
-            var script = new JSScript(@"context.calculator.Add(context.A, context.B)");
+            IScriptEngine<Script> engine = new JintScriptEngine();
+            var script = new Script(@"context.calculator.Add(context.A, context.B)");
             var context = new TestContext(){Calculator = new TestCalculator(), A = 1, B=2};
             var environment = new ScriptEnvironment<TestContext>("1.0","1.0",context);
             var executionRes = await engine.Run(script, environment);

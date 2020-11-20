@@ -5,12 +5,17 @@ using PolicyExample.Scripting.Jint;
 
 namespace PolicyExample.Scripting.GraphLogic
 {
+    
+    
+    
     public class JintNodeExecutor:INodeExecutor
     {
         private readonly Engine _engine;
+        private readonly ScriptServiceSet _serviceSet;
 
-        public JintNodeExecutor()
+        public JintNodeExecutor(ScriptServiceSet? serviceSet=null)
         {
+            _serviceSet = serviceSet ?? new ScriptServiceSet();
             _engine = new Engine();
         }
         

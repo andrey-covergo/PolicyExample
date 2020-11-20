@@ -185,9 +185,9 @@ mutation CreateNewNode {
             var client = new PolicyExampleGraphQLClient(SetupTestHostAndClient());
 
             var createLogicGraphResult = await client.Execute(
-                new CreateLogicGraphCommand(){Id="abc",
-                                              Name="new graph", 
-                                              ProvidedContexts = new List<string>{"a","b","c"}
+                new  CreateLogicGraphCommand(){Id="abc",
+                                                Name="new graph", 
+                                                ProvidedContexts = new List<string>{"a","b","c"}
                 }
             );
             

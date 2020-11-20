@@ -2,9 +2,9 @@ using System.Collections.Generic;
 
 namespace PolicyExample.Scripting.Jint
 {
-    public class JSScript:IScript
+    public class Script:IScript
     {
-        public JSScript(string javaScriptCode, Language? language=null, params ScriptService[] services)
+        public Script(string javaScriptCode, Language? language=null, params ScriptService[] services)
         {
             Code = javaScriptCode;
             Language = language ?? Language.JavaScriptEs5;

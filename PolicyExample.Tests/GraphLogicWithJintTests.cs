@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,7 +20,7 @@ namespace PolicyExample.Tests
             var childA = new LogicNode()
             {
                 Name = "nodeA", Parent = root,
-                Script = new JSScript("bad script")
+                Script = new Script("bad script")
             };
             var childB = new LogicNode() {Name = "nodeB", Parent = root};
             root.Children.Add(childA);
@@ -52,7 +53,7 @@ namespace PolicyExample.Tests
             var childA = new LogicNode()
             {
                 Name = "nodeA", Parent = root,
-                Script = new JSScript("flow.Stop();")
+                Script = new Script("flow.Stop();")
             };
             var childB = new LogicNode() {Name = "nodeB", Parent = root};
             root.Children.Add(childA);
@@ -82,7 +83,7 @@ namespace PolicyExample.Tests
             var childA = new LogicNode()
             {
                 Name = "nodeA", Parent = root,
-                Script = new JSScript("flow.RedirectToChild(1);")
+                Script = new Script("flow.RedirectToChild(1);")
             };
             var childB = new LogicNode() {Name = "nodeB", Parent = root};
             root.Children.Add(childA);

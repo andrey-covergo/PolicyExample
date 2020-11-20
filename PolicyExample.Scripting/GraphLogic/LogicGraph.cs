@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace PolicyExample.Scripting.GraphLogic
@@ -23,5 +24,14 @@ namespace PolicyExample.Scripting.GraphLogic
                 currentNode = res.NextNode;
             }
         }
+
+        public void Validate()
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+    
+    public class MissingScriptServicesException:Exception
+    {
     }
 }
